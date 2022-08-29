@@ -11,7 +11,7 @@ import java.util.*;
 @Slf4j
 @RestController
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Long, Film> films = new HashMap<>();
 
     private int filmId = 1;
 
@@ -25,16 +25,11 @@ public class FilmController {
     public Film create(@Valid @RequestBody Film film) {
 
         if (films.containsKey(film.getId())) {
-            log.info("Фильм с таким id уже существует");
-            throw new FilmAlreadyExistException("Фильм с таким id уже существует");
+            log.error("Фильм с id: " + film.getId() + " уже существует");
+            throw new FilmAlreadyExistException("Фильм с id: " + film.getId() + " уже существует");
         }
 
-        Calendar cal = Calendar.getInstance();
-        cal.set(1895, Calendar.DECEMBER, 28);
-        if (film.getReleaseDate().before(cal.getTime())) {
-            log.info("Дата релиза должна быть после 1895-12-28");
-            throw new FilmDateException("Дата релиза должна быть после 1895-12-28");
-        }
+        validateFilmDate(film);
 
         film.setId(generateFilmId());
         log.info("Post \"/films\" " + film);
@@ -43,21 +38,14 @@ public class FilmController {
     }
 
     @PutMapping("/films")
-    public Film saveFilm(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
 
         if (!films.containsKey(film.getId())) {
-            log.info("Фильм с таким id не найден");
-            throw new FilmIdUnknownException("Фильм с таким id не найден");
+            log.error("Фильм с id: " + film.getId() +" не найден");
+            throw new FilmIdUnknownException("Фильм с id: " + film.getId() +" не найден");
         }
 
-        {
-            Calendar cal = Calendar.getInstance();
-            cal.set(1895, Calendar.DECEMBER, 28);
-            if (film.getReleaseDate().before(cal.getTime())) {
-                log.info("Дата релиза должна быть после 1895-12-28");
-                throw new FilmDateException("Дата релиза должна быть после 1895-12-28");
-            }
-        }
+        validateFilmDate(film);
 
         // Если фильма нет в базе, для него генерируется id
         if (!films.containsKey(film.getId())) {
@@ -71,5 +59,14 @@ public class FilmController {
 
     private int generateFilmId() {
         return filmId++;
+    }
+
+    private void validateFilmDate (Film film) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(1895, Calendar.DECEMBER, 28);
+        if (film.getReleaseDate().before(cal.getTime())) {
+            log.error("Дата релиза должна быть после 1895-12-28");
+            throw new FilmDateException("Дата релиза должна быть после 1895-12-28");
+        }
     }
 }

@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 @RequiredArgsConstructor
 public class Film {
-    private int id;
+    private long id;
     @NotNull
     @NotBlank
     private String name;

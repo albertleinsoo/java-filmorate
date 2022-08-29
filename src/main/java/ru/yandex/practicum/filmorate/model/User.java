@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 @RequiredArgsConstructor
 public class User {
-    private int id;
+    private long id;
     @Email
     @NotNull
     @NotBlank

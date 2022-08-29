@@ -16,7 +16,7 @@ import java.util.Map;
 public class UserController {
 
     private int userId = 1;
-    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
 
     @GetMapping("/users")
     public List<User> findAll() {
@@ -28,13 +28,13 @@ public class UserController {
     public User create(@Valid @RequestBody User user) {
 
         if (users.containsKey(user.getId())) {
-            log.info("Пользователь с таким id уже существует");
+            log.error("Пользователь с таким id уже существует");
             throw new UserAlreadyExistException("Пользователь с таким id уже существует");
         }
 
         if (isContainsUserLogin(user.getLogin())) {
-            log.info("Пользователь с таким логином уже существует");
-            throw new UserLoginAlreadyExistsException("Пользователь с таким логином уже существует");
+            log.error("Пользователь с логином: " + user.getLogin() + " уже существует");
+            throw new UserLoginAlreadyExistsException("Пользователь с логином: " + user.getLogin() + " уже существует");
         }
 
         user.setId(generateUserId());
@@ -49,11 +49,16 @@ public class UserController {
     }
 
     @PutMapping("/users")
-    public User saveFilm(@Valid @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
 
         if (!users.containsKey(user.getId())) {
-            log.info("Нельзя обновить пользователя с неизвестным id");
-            throw new UserIdUnknownException("Нельзя обновить пользователя с неизвестным id");
+            log.error("Нельзя обновить пользователя с неизвестным id: " + user.getId());
+            throw new UserIdUnknownException("Нельзя обновить пользователя с неизвестным id: " + user.getId());
+        }
+
+        if (isContainsUserLogin(user.getLogin())) {
+            log.error("Пользователь с логином: " + user.getLogin() + " уже существует");
+            throw new UserLoginAlreadyExistsException("Пользователь с логином: " + user.getLogin() + " уже существует");
         }
 
         if (user.getName() == null || user.getName().equals("")) {
