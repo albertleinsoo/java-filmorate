@@ -9,11 +9,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import java.util.Date;
+import java.util.Set;
 
 @Data
 @RequiredArgsConstructor
 public class User {
     private long id;
+    private Set<Long> friends;
     @Email
     @NotNull
     @NotBlank
