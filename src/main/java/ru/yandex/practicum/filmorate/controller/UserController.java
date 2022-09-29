@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeptions.*;
 import ru.yandex.practicum.filmorate.model.User;
@@ -36,12 +37,12 @@ public class UserController {
 
     @GetMapping("/users/{id}/friends")
     public List<User> userFriends(@PathVariable long id) {
-        throw new MethodNotImplementedException("UserController.userFriends");
+        return userService.userFriends(id);
     }
 
     @GetMapping("/users/{id}/friends/common/{otherId}")
     public List<User> commonFriends(@PathVariable long id, @PathVariable long otherId) {
-        throw new MethodNotImplementedException("UserController.commonFriends");
+        return userService.commonFriends(id, otherId);
     }
 
     @PostMapping(value = "/users")
@@ -55,12 +56,12 @@ public class UserController {
     }
 
     @PutMapping("/users/{id}/friends/{friendId}")
-    public User addFriend(@PathVariable long id, @PathVariable long friendId) {
-        throw new MethodNotImplementedException("UserController.addFriend");
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/users/{id}/friends/{friendId}")
-    public User removeFriend(@PathVariable long id, @PathVariable String friendId) {
-        throw new MethodNotImplementedException("UserController.removeFriend");
+    public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
+        userService.deleteFriend(id, friendId);
     }
 }
