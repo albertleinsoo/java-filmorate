@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -69,41 +68,28 @@ public class UserService {
      * @return Список друзей пользователя
      */
     public List<User> userFriends(final long id) {
-        try {
-            //Формируется список друзей пользователя
-            List<User> friends = new ArrayList<>();
-            for (Long friendId: userStorage.getUser(id).getFriends()) {
-                friends.add(userStorage.getUser(friendId));
-            }
-
-            return friends;
-        } catch (UserIdUnknownException e) {
-            throw e;
+        //Формируется список друзей пользователя
+        List<User> friends = new ArrayList<>();
+        for (Long friendId: userStorage.getUser(id).getFriends()) {
+            friends.add(userStorage.getUser(friendId));
         }
+
+        return friends;
     }
 
     public List<User> commonFriends(final long id, final long otherId) {
-        try {
-            List<User> commonFriends = new ArrayList<>();
-            for (Long friendId: userStorage.getUser(id).getFriends()) {
-                if (userStorage.getUser(otherId).getFriends().contains(friendId)) {
-                    commonFriends.add(userStorage.getUser(friendId));
-                }
+        List<User> commonFriends = new ArrayList<>();
+        for (Long friendId: userStorage.getUser(id).getFriends()) {
+            if (userStorage.getUser(otherId).getFriends().contains(friendId)) {
+                commonFriends.add(userStorage.getUser(friendId));
             }
-
-            return commonFriends;
-        } catch (UserIdUnknownException e) {
-            throw e;
         }
+
+        return commonFriends;
     }
 
-
-    private boolean isUserExists(final long id) {
-        try {
-            userStorage.getUser(id);
-            return true;
-        } catch (UserIdUnknownException e) {
-            throw e;
-        }
+    public boolean isUserExists(final long id) {
+        userStorage.getUser(id);
+        return true;
     }
 }

@@ -3,17 +3,18 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exeptions.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
 public class FilmController {
+    private final static short DEFAULT_POPULAR_FILMS_COUNT = 10;
 
     private final FilmService filmService;
     private final UserService userService;
@@ -32,14 +33,14 @@ public class FilmController {
     @GetMapping("/films/popular")
     public List<Film> popular (@RequestParam @PathVariable Optional<Integer> count){
         if (count.isPresent()) {
-            throw new MethodNotImplementedException("FilmController.popular");
+            return filmService.getPopular(count.get());
         } else {
-            throw new MethodNotImplementedException("FilmController.popular");
+            return filmService.getPopular(DEFAULT_POPULAR_FILMS_COUNT);
         }
     }
 
     @GetMapping("/films/{id}")
-    public Film getFilm(@PathVariable long id) {
+    public Film getFilm(@PathVariable final long id) {
         return filmService.getFilm(id);
     }
 
@@ -54,14 +55,14 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public Film addLike (@PathVariable long id, @PathVariable long userId) {
-        throw new MethodNotImplementedException("FilmController.addLike");
+    public Film addLike (@PathVariable final long id, @PathVariable final long userId) {
+        return filmService.addLike(id, userId);
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    public Film removeLike(@PathVariable long id, @PathVariable long userId)
+    public Film removeLike(@PathVariable final long id, @PathVariable final long userId)
     {
-        throw new MethodNotImplementedException("FilmController.removeLike");
+        return filmService.deleteLike(id, userId);
     }
 
 }
