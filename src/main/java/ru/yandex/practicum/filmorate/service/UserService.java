@@ -88,7 +88,7 @@ public class UserService {
         return commonFriends;
     }
 
-    public boolean isUserExists(final long id) {
+    private boolean isUserExists(final long id) {
         userStorage.getUser(id);
         return true;
     }

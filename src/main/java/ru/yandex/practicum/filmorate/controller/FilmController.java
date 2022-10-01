@@ -9,12 +9,10 @@ import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RestController
 public class FilmController {
-    private final static short DEFAULT_POPULAR_FILMS_COUNT = 10;
 
     private final FilmService filmService;
     private final UserService userService;
@@ -31,12 +29,8 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> popular (@RequestParam @PathVariable Optional<Integer> count){
-        if (count.isPresent()) {
-            return filmService.getPopular(count.get());
-        } else {
-            return filmService.getPopular(DEFAULT_POPULAR_FILMS_COUNT);
-        }
+    public List<Film> popular (@RequestParam(defaultValue = "10") final int count){
+        return filmService.getPopular(count);
     }
 
     @GetMapping("/films/{id}")
@@ -60,8 +54,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/films/{id}/like/{userId}")
-    public Film removeLike(@PathVariable final long id, @PathVariable final long userId)
-    {
+    public Film removeLike(@PathVariable final long id, @PathVariable final long userId) {
         return filmService.deleteLike(id, userId);
     }
 

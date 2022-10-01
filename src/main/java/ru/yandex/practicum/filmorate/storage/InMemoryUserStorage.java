@@ -70,7 +70,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User delete(long id) {
-        throw new MethodNotImplementedException("InMemoryUserStorage.delete");
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.delete\" ещё не реализован");
     }
 
     @Override

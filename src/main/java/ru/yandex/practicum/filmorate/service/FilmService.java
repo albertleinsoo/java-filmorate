@@ -1,22 +1,27 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exeptions.FilmDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class FilmService {
     private FilmStorage filmStorage;
-    private UserService userService;
+    private UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserService userService) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
-        this.userService = userService;
+        this.userStorage = userStorage;
     }
 
     public List<Film> findAll() {
@@ -24,10 +29,12 @@ public class FilmService {
     }
 
     public Film create(Film film) {
+        validateFilmDate(film);
         return filmStorage.create(film);
     }
 
     public Film update(Film film) {
+        validateFilmDate(film);
         return filmStorage.update(film);
     }
 
@@ -36,14 +43,14 @@ public class FilmService {
     }
 
     public Film addLike(final long id, final long userId) {
-        if (isFilmExists(id) && userService.isUserExists(userId)) {
+        if (isFilmExists(id) && isUserExists(userId)) {
             filmStorage.getFilm(id).getLikes().add(userId);
         }
         return filmStorage.getFilm(id);
     }
 
     public Film deleteLike(final long id, final long userId) {
-        if (isFilmExists(id) && userService.isUserExists(userId)) {
+        if (isFilmExists(id) && isUserExists(userId)) {
             filmStorage.getFilm(id).getLikes().remove(userId);
         }
         return filmStorage.getFilm(id);
@@ -58,8 +65,22 @@ public class FilmService {
         return sortedFilms.stream().limit(count).collect(Collectors.toList());
     }
 
-    public boolean isFilmExists(final long id) {
+    private boolean isFilmExists(final long id) {
         filmStorage.getFilm(id);
         return true;
+    }
+
+    private boolean isUserExists(final long id) {
+        userStorage.getUser(id);
+        return true;
+    }
+
+    private void validateFilmDate (Film film) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(1895, Calendar.DECEMBER, 28);
+        if (film.getReleaseDate().before(cal.getTime())) {
+            log.error("Дата релиза должна быть после 1895-12-28");
+            throw new FilmDateException("Дата релиза должна быть после 1895-12-28");
+        }
     }
 }
