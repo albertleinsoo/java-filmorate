@@ -35,7 +35,7 @@ public class UserService {
     }
 
     /**
-     *
+     * Добавление пользователя в список друзей
      * @param id Id пользователя, который добавляет в друзья
      * @param friendId Id пользователя, которого добавляют в друзья
      */
@@ -49,7 +49,7 @@ public class UserService {
     }
 
     /**
-     *
+     * Удаление пользователя из списка друзей
      * @param id Id пользователя, который удаляет в друга
      * @param friendId Id пользователя, которого удаляют из друзей
      */
@@ -63,7 +63,7 @@ public class UserService {
     }
 
     /**
-     *
+     * Друзья пользователя
      * @param id Id пользователя
      * @return Список друзей пользователя
      */
@@ -77,6 +77,12 @@ public class UserService {
         return friends;
     }
 
+    /**
+     * Список общих друзей с пользователем
+     * @param id id пользователя
+     * @param otherId id другого пользователя, с которым нужно найти общих друзей
+     * @return Список пользователей, которые являются общими друзьями пользователей id и otherId
+     */
     public List<User> commonFriends(final long id, final long otherId) {
         List<User> commonFriends = new ArrayList<>();
         for (Long friendId: userStorage.getUser(id).getFriends()) {
