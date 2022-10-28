@@ -5,7 +5,7 @@ FROM (
     LEFT OUTER JOIN USER_FRIENDS AS UF ON U.USER_ID=UF.USER_ID
     WHERE U.USER_ID = 2 --Id Пользователя, друзей которого ищем
 ) AS UF_IDS
-JOIN USERS AS U ON UF_IDS.FRIEND_ID=U.USER_ID
+JOIN USERS AS U ON UF_IDS.FRIEND_ID=U.USER_ID;
 
 -- список друзей, общих с другим пользователем.
 SELECT U1_FRIENDS.LOGIN, U1_FRIENDS.NAME
@@ -27,7 +27,7 @@ JOIN (
     ) AS UF_IDS
     JOIN USERS AS U ON UF_IDS.FRIEND_ID=U.USER_ID
 ) AS U2_FRIENDS
-ON U1_FRIENDS.USER_ID=U2_FRIENDS.USER_ID
+ON U1_FRIENDS.USER_ID=U2_FRIENDS.USER_ID;
 
 -- возвращает список из первых 10 фильмов по количеству лайков.
 
