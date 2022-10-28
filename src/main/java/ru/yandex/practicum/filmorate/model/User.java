@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -13,7 +12,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@RequiredArgsConstructor
 public class User {
     private long id;
     private Set<Long> friends = new HashSet<>();
