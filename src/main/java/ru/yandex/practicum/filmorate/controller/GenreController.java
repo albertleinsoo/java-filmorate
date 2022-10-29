@@ -29,8 +29,6 @@ public class GenreController {
      */
     @GetMapping()
     public List<Genre> findAll() {
-        log.debug("Текущее количество пользователей: {}", genreService.getGenreAll().size());
-
         return genreService.getGenreAll();
     }
 

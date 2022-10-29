@@ -46,6 +46,20 @@ public class ErrorHandler {
         return e.getMessage();
     }
 
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleRatingIdUnknownException(final RatingIdException e) {
+        return e.getMessage();
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleGenreIdUnknownException(final GenreIdException e) {
+        return e.getMessage();
+    }
+
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleThrowable(final Throwable e) {

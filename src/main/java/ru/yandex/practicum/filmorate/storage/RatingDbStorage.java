@@ -19,12 +19,18 @@ public class RatingDbStorage implements RatingStorage{
 
     @Override
     public List<Rating> getAllRatings() {
-        return null;
+        final String FIND_ALL_MPA = "SELECT * " +
+                "FROM RATINGS";
+        return jdbcTemplate.query(FIND_ALL_MPA, this::mapRowToRating);
     }
 
     @Override
     public Rating getRatingById(long ratingId) {
-        return null;
+        final String FIND_MPA_BY_ID = "SELECT * " +
+                "FROM RATINGS " +
+                "WHERE RATING_ID = ?";
+
+        return jdbcTemplate.queryForObject(FIND_MPA_BY_ID, this::mapRowToRating, ratingId);
     }
 
     private Rating mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {

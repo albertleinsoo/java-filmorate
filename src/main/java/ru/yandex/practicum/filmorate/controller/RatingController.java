@@ -24,7 +24,7 @@ public class RatingController {
     }
 
     /**
-     * Возвращает список всех рейтонгов
+     * Возвращает список всех рейтингов
      * @return Список рейтингов
      */
     @GetMapping()
@@ -42,8 +42,6 @@ public class RatingController {
      */
     @GetMapping("/{id}")
     public Rating getRatingById(@Valid @PathVariable int id) {
-        log.debug("Поиск mpa: {}", ratingService.getRatingById(id).getName());
-
         return ratingService.getRatingById(id);
     }
 }

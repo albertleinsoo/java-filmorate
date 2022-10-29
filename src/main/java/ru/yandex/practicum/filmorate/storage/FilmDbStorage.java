@@ -116,8 +116,8 @@ public class FilmDbStorage implements FilmStorage {
                 "GROUP BY f.film_id " +
                 "ORDER BY COUNT(fl.user_id) DESC " +
                 "LIMIT ?";
-        List<Film> films = jdbcTemplate.query(findPopularFilmsWithLikes, this::mapRowToFilm, count);
-        return films;
+
+        return jdbcTemplate.query(findPopularFilmsWithLikes, this::mapRowToFilm, count);
     }
 
     /**
@@ -127,10 +127,10 @@ public class FilmDbStorage implements FilmStorage {
      * @return Статус операции (true или false)
      */
     @Override
-    public boolean addLike(long userId, long filmId) {
+    public boolean addLike(long filmId, long userId) {
         String insertFilmLike = "INSERT INTO FILM_LIKES (film_id, user_id) " +
                 "VALUES(?, ?)";
-        return (jdbcTemplate.update(insertFilmLike, userId, filmId)) > 0;
+        return (jdbcTemplate.update(insertFilmLike, filmId, userId)) > 0;
     }
 
     /**

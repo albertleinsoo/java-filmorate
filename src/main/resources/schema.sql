@@ -30,7 +30,7 @@ create table FILMS
 
 create table FILM_GENRE
 (
-    FILM_GENRE_ID BIGINT not null
+    FILM_GENRE_ID BIGINT auto_increment
         primary key,
     FILM_ID       BIGINT not null,
     GENRE_ID      BIGINT not null,
