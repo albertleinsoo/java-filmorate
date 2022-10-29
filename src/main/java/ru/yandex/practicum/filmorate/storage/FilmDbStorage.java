@@ -63,7 +63,7 @@ public class FilmDbStorage implements FilmStorage {
                 , film.getDescription()
                 , film.getReleaseDate()
                 , film.getDuration()
-                , film.getRating().getId()
+                , film.getMpa().getId()
                 , film.getId());
 
         final String DELETE_GENRES_BY_FILM_ID = "DELETE FROM film_genre " +
@@ -151,9 +151,9 @@ public class FilmDbStorage implements FilmStorage {
         return Film.builder()
                 .id(resultSet.getLong("film_id"))
                 .name(resultSet.getString("name"))
-                .rating(getSetRating(resultSet))
+                .mpa(getSetRating(resultSet))
                 .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .genres(getSetGenres(resultSet))
                 .build();

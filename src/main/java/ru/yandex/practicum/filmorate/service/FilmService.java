@@ -4,12 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.FilmDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.Calendar;
+import javax.validation.ValidationException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -80,11 +80,20 @@ public class FilmService {
     }
 
     private void validateFilmDate (Film film) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(1895, Calendar.DECEMBER, 28);
-        if (film.getReleaseDate().before(cal.getTime())) {
-            log.error("Дата релиза должна быть после 1895-12-28");
-            throw new FilmDateException("Дата релиза должна быть после 1895-12-28");
+
+        try {
+            if (film.getName().isEmpty()) {
+                throw new ValidationException("Нет названия фильма");
+            } else if (film.getDescription().isEmpty() || film.getDescription().length() > 200) {
+                throw new ValidationException("Описание превышает 200 символов");
+            } else if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+                throw new ValidationException("Дата релиза должна быть после 1895-12-28");
+            } else if (film.getDuration() <= 0) {
+                throw new ValidationException("Продолжительность фильма не может быть отрицательной");
+            }
+        } catch (ValidationException e) {
+            log.warn(e.getMessage());
+            throw e;
         }
     }
 }

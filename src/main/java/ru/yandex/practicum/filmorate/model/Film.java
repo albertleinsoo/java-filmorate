@@ -8,7 +8,11 @@ import org.hibernate.validator.constraints.Length;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
-import java.util.*;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @Builder
@@ -16,9 +20,8 @@ public class Film {
     private long id;
     private Set<Long> likes;
     private List<Genre> genres;
-    @NotNull
-    @NotBlank
-    private Rating rating;
+    int rate;
+    private Rating mpa;
     @NotNull
     @NotBlank
     private String name;
@@ -26,7 +29,7 @@ public class Film {
     private String description;
     @NotNull
     @JsonFormat(pattern="yyyy-MM-dd")
-    private Date releaseDate;
+    private LocalDate releaseDate;
     @NotNull
     @Positive
     private int duration;
@@ -34,7 +37,8 @@ public class Film {
     public Map<String, Object> toMap() {
         Map<String, Object> values = new HashMap<>();
         values.put("name", name);
-        values.put("rating_id", rating.getId());
+        values.put("rate", rate);
+        values.put("rating_id", mpa.getId());
         values.put("description", description);
         values.put("release_date", releaseDate);
         values.put("duration", duration);

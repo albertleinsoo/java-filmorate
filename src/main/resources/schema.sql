@@ -1,21 +1,23 @@
-create table IF NOT EXISTS RATINGS
+DROP TABLE IF EXISTS USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS;
+
+create table GENRE
+(
+    GENRE_ID BIGINT            not null
+        primary key,
+    NAME     CHARACTER VARYING not null
+        unique
+);
+
+create table RATINGS
 (
     RATING_ID   BIGINT            not null
-    primary key,
+        primary key,
     RATING_NAME CHARACTER VARYING not null
 );
 
-create table IF NOT EXISTS GENRE
+create table FILMS
 (
-    GENRE_ID BIGINT            not null
-    primary key,
-    NAME     CHARACTER VARYING not null
-    unique
-);
-
-create table IF NOT EXISTS FILMS
-(
-    FILM_ID      BIGINT            not null
+    FILM_ID      BIGINT auto_increment
         primary key,
     NAME         CHARACTER VARYING not null,
     DESCRIPTION  CHARACTER VARYING(200),
@@ -26,7 +28,7 @@ create table IF NOT EXISTS FILMS
         foreign key (RATING_ID) references RATINGS
 );
 
-create table IF NOT EXISTS FILM_GENRE
+create table FILM_GENRE
 (
     FILM_GENRE_ID BIGINT not null
         primary key,
@@ -40,9 +42,9 @@ create table IF NOT EXISTS FILM_GENRE
         foreign key (GENRE_ID) references GENRE
 );
 
-create table IF NOT EXISTS USERS
+create table USERS
 (
-    USER_ID  BIGINT            not null
+    USER_ID  BIGINT auto_increment
         primary key,
     EMAIL    CHARACTER VARYING not null,
     LOGIN    CHARACTER VARYING not null,
@@ -50,9 +52,9 @@ create table IF NOT EXISTS USERS
     BIRTHDAY DATE              not null
 );
 
-create table IF NOT EXISTS FILM_LIKES
+create table FILM_LIKES
 (
-    ID      BIGINT not null
+    ID      BIGINT auto_increment
         primary key,
     FILM_ID BIGINT not null,
     USER_ID BIGINT not null,
@@ -64,13 +66,13 @@ create table IF NOT EXISTS FILM_LIKES
         foreign key (USER_ID) references USERS
 );
 
-create table IF NOT EXISTS USER_FRIENDS
+create table USER_FRIENDS
 (
-    USER_FRIENDS_ID     BIGINT  not null
+    USER_FRIENDS_ID     BIGINT auto_increment
         primary key,
-    USER_ID             BIGINT  not null,
-    FRIEND_ID           BIGINT  not null,
-    CONFIRMED_BY_FRIEND BOOLEAN not null,
+    USER_ID             BIGINT                not null,
+    FRIEND_ID           BIGINT                not null,
+    CONFIRMED_BY_FRIEND CHARACTER VARYING(20) not null,
     constraint USER_FRIENDS_UK
         unique (USER_ID, FRIEND_ID),
     constraint USER_FRIENDS_USERS_USER_ID_FK

@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.exeptions.UserLoginAlreadyExistsException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Component
@@ -68,10 +65,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    @Override
-    public User delete(long id) {
-        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.delete\" ещё не реализован");
-    }
+
 
     @Override
     public User getUser(long id) {
@@ -80,6 +74,31 @@ public class InMemoryUserStorage implements UserStorage {
             throw new UserIdUnknownException(id);
         }
         return users.get(id);
+    }
+
+    @Override
+    public boolean delete(User user) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.delete\" ещё не реализован");
+    }
+
+    @Override
+    public List<User> getFriendList(long id) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.getFriendList\" ещё не реализован");
+    }
+
+    @Override
+    public boolean addFriend(long id, long friendId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.addFriend\" ещё не реализован");
+    }
+
+    @Override
+    public boolean deleteFriend(long id, long friendId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.deleteFriend\" ещё не реализован");
+    }
+
+    @Override
+    public Set<Long> getFriendsIdListByUserId(long id) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.getFriendsIdListByUserId\" ещё не реализован");
     }
 
     /**
