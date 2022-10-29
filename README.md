@@ -3,4 +3,4 @@
 
 [Пример запросов к БД](https://github.com/albertleinsoo/java-filmorate/blob/main/filmorate_DB_queries.sql)
 
-![Диаграмма БД filmorate](https://github.com/albertleinsoo/java-filmorate/blob/main/filmorate_DB_Diagram_2.png)
+![Диаграмма БД filmorate](https://github.com/albertleinsoo/java-filmorate/blob/add-database/filmorate_DB_Diagram_2.png)
