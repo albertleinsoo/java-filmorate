@@ -43,36 +43,26 @@ public class FilmService {
     }
 
     public boolean addLike(final long id, final long userId) {
-        try {
-            if (id <= 0) {
-                throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
-            }
-
-            if (userId <= 0) {
-                throw new UserIdUnknownException(userId);
-            }
-            return filmStorage.addLike(id, userId);
-        } catch (FilmIdUnknownException | UserIdUnknownException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (id <= 0) {
+            throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
         }
+
+        if (userId <= 0) {
+            throw new UserIdUnknownException(userId);
+        }
+        return filmStorage.addLike(id, userId);
     }
 
     public boolean deleteLike(final long id, final long userId) {
-        try {
-            if (id <= 0) {
-                throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
-            }
-
-            if (userId <= 0) {
-                throw new UserIdUnknownException(userId);
-            }
-
-            return filmStorage.deleteLike(userId, id);
-        } catch (FilmIdUnknownException | UserIdUnknownException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (id <= 0) {
+            throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
         }
+
+        if (userId <= 0) {
+            throw new UserIdUnknownException(userId);
+        }
+
+        return filmStorage.deleteLike(userId, id);
     }
 
     public List<Film> getPopular(final int count) {
@@ -80,7 +70,6 @@ public class FilmService {
     }
 
     private void validateFilmDate (Film film) {
-
         try {
             if (film.getName().isEmpty()) {
                 throw new ValidationException("Нет названия фильма");

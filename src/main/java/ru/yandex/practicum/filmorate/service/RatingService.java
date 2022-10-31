@@ -32,13 +32,8 @@ public class RatingService {
      * @return Возвращаемый рейтинг
      */
     public Rating getRatingById(int ratingId) {
-        try {
-            if (ratingId <= 0) {
-                throw new RatingIdException("id рейтинга должен быть больше 0");
-            }
-        } catch (RatingIdException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (ratingId <= 0) {
+            throw new RatingIdException("id рейтинга должен быть больше 0");
         }
         return ratingStorage.getRatingById(ratingId);
     }

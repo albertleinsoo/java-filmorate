@@ -27,8 +27,9 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public List<Film> findAll() {
-        final String findAllFilms = "SELECT * " +
-                "FROM films";
+        final String findAllFilms = "SELECT FILMS.*, RATINGS.RATING_NAME " +
+                "FROM FILMS, RATINGS " +
+                "WHERE FILMS.RATING_ID = RATINGS.RATING_ID";
         return jdbcTemplate.query(findAllFilms, this::mapRowToFilm);
     }
 
@@ -93,9 +94,9 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public Film getFilm(long id) {
-        final String findFilmById = "SELECT * " +
-                "FROM films " +
-                "WHERE film_id = ?";
+        final String findFilmById = "SELECT FILMS.*, RATINGS.RATING_NAME " +
+                "FROM films, RATINGS " +
+                "WHERE FILMS.RATING_ID = RATINGS.RATING_ID AND film_id = ?";
         Film film = jdbcTemplate.queryForObject(findFilmById, this::mapRowToFilm, id);
         if (film.getGenres().size() == 0) {
             film.setGenres(null);
@@ -110,9 +111,10 @@ public class FilmDbStorage implements FilmStorage {
      */
     @Override
     public List<Film> getPopularFilms(int count) {
-        final String findPopularFilmsWithLikes = "SELECT f.* " +
+        final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
                 "FROM films f " +
                 "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
+                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
                 "GROUP BY f.film_id " +
                 "ORDER BY COUNT(fl.user_id) DESC " +
                 "LIMIT ?";
@@ -151,7 +153,7 @@ public class FilmDbStorage implements FilmStorage {
         return Film.builder()
                 .id(resultSet.getLong("film_id"))
                 .name(resultSet.getString("name"))
-                .mpa(getSetRating(resultSet))
+                .mpa(new Rating(resultSet.getLong("rating_id"), resultSet.getString("rating_name")))
                 .description(resultSet.getString("description"))
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))

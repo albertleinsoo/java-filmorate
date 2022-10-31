@@ -10,10 +10,10 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.xml.bind.ValidationException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -54,20 +54,14 @@ public class UserService {
      * @param friendId Id пользователя, которого добавляют в друзья
      */
     public void addFriend(final long id, final long friendId) {
-        try {
-            if (id <= 0) {
-                throw new UserIdUnknownException(id);
-            }
-            if (friendId <= 0) {
-                throw new UserIdUnknownException(friendId);
-            }
-
-            userStorage.addFriend(id, friendId);
-
-        } catch (UserIdUnknownException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (userStorage.getUser(id) == null) {
+            throw new UserIdUnknownException(id);
         }
+        if (userStorage.getUser(friendId) == null) {
+            throw new UserIdUnknownException(friendId);
+        }
+
+        userStorage.addFriend(id, friendId);
     }
 
     /**
@@ -76,20 +70,14 @@ public class UserService {
      * @param friendId Id пользователя, которого удаляют из друзей
      */
     public void deleteFriend(final long id, final long friendId) {
-
-        try {
-            if (id <= 0) {
-                throw new UserIdUnknownException(id);
-            }
-            if (friendId <= 0) {
-                throw new UserIdUnknownException(friendId);
-            }
-
-            userStorage.deleteFriend(id, friendId);
-        } catch (UserIdUnknownException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (userStorage.getUser(id) == null) {
+            throw new UserIdUnknownException(id);
         }
+        if (userStorage.getUser(friendId) == null) {
+            throw new UserIdUnknownException(friendId);
+        }
+
+        userStorage.deleteFriend(id, friendId);
     }
 
     /**
@@ -109,29 +97,22 @@ public class UserService {
      * @return Список пользователей, которые являются общими друзьями пользователей id и otherId
      */
     public List<User> commonFriends(final long id, final long otherId) {
-        List<User> commonFriends = new ArrayList<>();
-
-        try {
-            if (id <= 0) {
-                throw new UserIdUnknownException(id);
-            }
-            if (otherId <= 0) {
-                throw new UserIdUnknownException(otherId);
-            }
-
-            Set<Long> userFriends = new HashSet<>(userStorage.getFriendsIdListByUserId(id));
-            Set<Long> otherFriends = new HashSet<>(userStorage.getFriendsIdListByUserId(otherId));
-
-            userFriends.retainAll(otherFriends);
-
-            for (long userFriendsId : userFriends) {
-                commonFriends.add(userStorage.getUser(userFriendsId));
-            }
-        } catch (UserIdUnknownException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (userStorage.getUser(id) == null) {
+            throw new UserIdUnknownException(id);
         }
-        return commonFriends;
+        if (userStorage.getUser(otherId) == null) {
+            throw new UserIdUnknownException(otherId);
+        }
+
+        Set<Long> userFriends = new HashSet<>(userStorage.getFriendsIdListByUserId(id));
+        Set<Long> otherFriends = new HashSet<>(userStorage.getFriendsIdListByUserId(otherId));
+
+        userFriends.retainAll(otherFriends);
+
+        return userFriends.stream()
+                .filter(otherFriends::contains)
+                .map(userId -> userStorage.getUser(userId))
+                .collect(Collectors.toList());
     }
 
     private boolean validateUser(User user) {
@@ -149,6 +130,5 @@ public class UserService {
             log.warn(e.getMessage());
             return false;
         }
-
     }
 }

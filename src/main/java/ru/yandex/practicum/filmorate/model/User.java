@@ -1,10 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -16,8 +13,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-@Data
 @Builder
+@EqualsAndHashCode
+@Getter
+@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class User {

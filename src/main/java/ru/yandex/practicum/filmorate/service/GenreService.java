@@ -32,13 +32,8 @@ public class GenreService {
      * @return Жанр
      */
     public Genre getGenreById(int genreId) {
-        try {
-            if (genreId <= 0) {
-                throw new GenreIdException("id жанра должен быть больше 0");
-            }
-        } catch (GenreIdException e) {
-            log.warn(e.getMessage());
-            throw e;
+        if (genreId <= 0) {
+            throw new GenreIdException("id жанра должен быть больше 0");
         }
         return genreStorage.getGenreById(genreId);
     }

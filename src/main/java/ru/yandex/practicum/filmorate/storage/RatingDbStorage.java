@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 @Qualifier("ratingDbStorage")
 @RequiredArgsConstructor
-public class RatingDbStorage implements RatingStorage{
+public class RatingDbStorage implements RatingStorage {
 
     private final JdbcTemplate jdbcTemplate;
 

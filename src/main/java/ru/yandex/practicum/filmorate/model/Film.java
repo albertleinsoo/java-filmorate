@@ -1,8 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotBlank;
@@ -14,13 +13,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Data
 @Builder
+@EqualsAndHashCode
+@Getter
+@Setter
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Film {
     private long id;
     private Set<Long> likes;
     private List<Genre> genres;
-    int rate;
+    private int rate;
     private Rating mpa;
     @NotNull
     @NotBlank
