@@ -37,9 +37,9 @@ create table FILM_GENRE
     constraint FILM_GENRE_UK
         unique (FILM_ID, GENRE_ID),
     constraint FILM_GENRE_FILMS_FILM_ID_FK
-        foreign key (FILM_ID) references FILMS,
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
     constraint FILM_GENRE_GENRE_GENRE_ID_FK
-        foreign key (GENRE_ID) references GENRE
+        foreign key (GENRE_ID) references GENRE ON DELETE CASCADE
 );
 
 create table USERS
