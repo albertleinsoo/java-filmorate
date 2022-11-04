@@ -7,7 +7,10 @@ import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
 import ru.yandex.practicum.filmorate.exeptions.MethodNotImplementedException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -48,7 +51,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film delete(long id) {
+    public boolean delete(long id) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.delete\" ещё не реализован");
     }
 
@@ -58,6 +61,21 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
         log.info("Get \"/films\" " + id);
         return films.get(id);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
+    public boolean addLike(long userId, long filmId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.addLike\" не реализован");
+    }
+
+    @Override
+    public boolean deleteLike(long userId, long filmId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.deleteLike\" не реализован");
     }
 
     private int generateFilmId() {
