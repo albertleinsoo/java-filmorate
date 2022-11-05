@@ -21,6 +21,9 @@ public class ReviewService {
 
     public Review create(Review review) {
         log.trace("В сервис {} получен запрос на создание отзыва {}", this.getClass(), review.toString());
+        if (review.getUserId() == 0 || review.getFilmId() == 0) {
+            throw new NullUserOrFilmIdException();
+        }
         if (!reviewDbStorage.checkUser(review.getUserId())) {
             throw new UserIdUnknownException(review.getUserId());
         }
@@ -44,7 +47,7 @@ public class ReviewService {
 
     public Review update(Review review) {
         log.trace("В сервис {} получен запрос на обновление отзыва {}", this.getClass(), review.toString());
-        if (!reviewDbStorage.checkReview(review)) {
+        if (!reviewDbStorage.checkReview(review.getReviewId())) {
             throw new ReviewNotExistsException(review);
         }
         return reviewDbStorage.update(review);
@@ -90,7 +93,7 @@ public class ReviewService {
             reviewDbStorage.addLike(id, userId);
             Review review = reviewDbStorage.get(id);
             review.setUseful(review.getUseful() + 1);
-            reviewDbStorage.update(review);
+            reviewDbStorage.updateUseful(review);
         } else {
             throw new LikeAlreadyExistsException(id, userId);
         }
@@ -111,7 +114,7 @@ public class ReviewService {
             reviewDbStorage.addDislike(id, userId);
             Review review = reviewDbStorage.get(id);
             review.setUseful(review.getUseful() - 1);
-            reviewDbStorage.update(review);
+            reviewDbStorage.updateUseful(review);
         } else {
             throw new DislikeAlreadyExistsException(id, userId);
         }
@@ -132,7 +135,7 @@ public class ReviewService {
             reviewDbStorage.deleteLike(id, userId);
             Review review = reviewDbStorage.get(id);
             review.setUseful(review.getUseful() - 1);
-            reviewDbStorage.update(review);
+            reviewDbStorage.updateUseful(review);
         } else {
             throw new LikeNotExistsException(id, userId);
         }
@@ -153,7 +156,7 @@ public class ReviewService {
             reviewDbStorage.deleteDislike(id, userId);
             Review review = reviewDbStorage.get(id);
             review.setUseful(review.getUseful() + 1);
-            reviewDbStorage.update(review);
+            reviewDbStorage.updateUseful(review);
         } else {
             throw new DislikeNotExistsException(id, userId);
         }

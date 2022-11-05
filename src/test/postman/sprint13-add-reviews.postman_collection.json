@@ -1,9 +1,9 @@
 {
 	"info": {
-		"_postman_id": "5ec436fc-674b-4e94-9f27-75436e4e96d5",
+		"_postman_id": "9cb3dc84-0d08-4be6-85f8-a7193a4442e4",
 		"name": "sprint13/add-reviews",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "23168331"
+		"_exporter_id": "2036415"
 	},
 	"item": [
 		{
@@ -11001,7 +11001,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Status code is 400\", function () {\r",
-									"     pm.expect(pm.response.code).to.be.oneOf([500, 404]);\r",
+									"     pm.expect(pm.response.code).to.be.oneOf([500, 400]);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -11171,7 +11171,7 @@
 							"script": {
 								"exec": [
 									"pm.test(\"Status code is 400\", function () {\r",
-									"     pm.expect(pm.response.code).to.be.oneOf([500, 404]);\r",
+									"     pm.expect(pm.response.code).to.be.oneOf([500, 400]);\r",
 									"});"
 								],
 								"type": "text/javascript"
@@ -11368,7 +11368,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"reviewId\": 1,\n  \"content\": \"This film is not too bad.\",\n  \"isPositive\": true,\n  \"userId\": 1,\n  \"filmId\": 1,\n  \"useful\": 0\n}",
+							"raw": "{\n  \"reviewId\": 1,\n  \"content\": \"This film is not too bad.\",\n  \"isPositive\": true,\n  \"userId\": 2,\n  \"filmId\": 2,\n  \"useful\": 10\n}",
 							"options": {
 								"raw": {
 									"language": "json"

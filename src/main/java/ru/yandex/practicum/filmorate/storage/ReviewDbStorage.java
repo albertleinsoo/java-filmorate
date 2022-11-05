@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,7 +18,7 @@ public class ReviewDbStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Autowired
-    public ReviewDbStorage (JdbcTemplate jdbcTemplate) {
+    public ReviewDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -43,18 +42,21 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review update(Review review) {
         final String SQL_UPDATE_REVIEW = "UPDATE REVIEWS SET " +
                 "CONTENT = ?, " +
-                "IS_POSITIVE = ?, " +
-                "USER_ID = ?, " +
-                "FILM_ID =?," +
-                "USEFUL = ? " +
+                "IS_POSITIVE = ? " +
                 "WHERE REVIEW_ID = ?";
         jdbcTemplate.update(SQL_UPDATE_REVIEW,
                 review.getContent(),
                 review.getIsPositive(),
-                review.getUserId(),
-                review.getFilmId(),
-                review.getUseful(),
                 review.getReviewId());
+        return review;
+    }
+
+    @Override
+    public Review updateUseful(Review review) {
+        final String SQL_UPDATE_REVIEW = "UPDATE REVIEWS SET " +
+                "USEFUL = ? " +
+                "WHERE REVIEW_ID = ?";
+        jdbcTemplate.update(SQL_UPDATE_REVIEW, review.getUseful(), review.getReviewId());
         return review;
     }
 

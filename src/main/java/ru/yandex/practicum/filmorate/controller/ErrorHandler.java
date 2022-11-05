@@ -81,7 +81,8 @@ public class ErrorHandler {
 
     @ExceptionHandler({DislikeAlreadyExistsException.class,
             ReviewAlreadyExistsException.class,
-            LikeAlreadyExistsException.class})
+            LikeAlreadyExistsException.class,
+            NullUserOrFilmIdException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleAlreadyExistsExceptions(final RuntimeException ex) {
         return ex.getMessage();

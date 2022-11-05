@@ -11,6 +11,8 @@ public interface ReviewStorage {
 
     Review update(Review review);
 
+    Review updateUseful(Review review);
+
     boolean delete(long id);
 
     List<Review> getAll();
