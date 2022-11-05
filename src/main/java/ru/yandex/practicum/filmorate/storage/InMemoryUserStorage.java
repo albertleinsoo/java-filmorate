@@ -77,7 +77,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public boolean delete(User user) {
+    public void deleteUser(long userId) {
         throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.delete\" ещё не реализован");
     }
 
@@ -99,6 +99,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Set<Long> getFriendsIdListByUserId(long id) {
         throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.getFriendsIdListByUserId\" ещё не реализован");
+    }
+
+    @Override
+    public boolean isUserExists(long userId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.isUserExists\" ещё не реализован");
     }
 
     /**

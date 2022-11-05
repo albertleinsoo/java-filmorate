@@ -81,12 +81,26 @@ public class UserService {
     }
 
     /**
+     * Удаление пользователя
+     * @param userId Id пользователя
+     */
+    public void deleteUser(long userId) {
+        if (userStorage.isUserExists(userId)) {
+            throw new UserIdUnknownException(userId);
+        }
+        userStorage.deleteUser(userId);
+    }
+
+    /**
      * Друзья пользователя
      * @param id Id пользователя
      * @return Список друзей пользователя
      */
     public List<User> userFriends(final long id) {
         //Формируется список друзей пользователя
+        if (userStorage.isUserExists(id)) {
+            throw new UserIdUnknownException(id);
+        }
         return userStorage.getFriendList(id);
     }
 
