@@ -23,7 +23,7 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
 
     /**
-     * @return  Список всех фильмов
+     * @return Список всех фильмов
      */
     @Override
     public List<Film> findAll() {
@@ -35,6 +35,7 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Добавление фильма
+     *
      * @param film Добавляемый фильм
      * @return Добавленный фильм с обновлённым списком жанров
      */
@@ -50,6 +51,7 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Обновление фильма
+     *
      * @param film Обновляемый фильм
      * @return Фильм с обновлённым списком жанров
      */
@@ -77,18 +79,20 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Удаление фильма
+     *
      * @param id Id удаляемого фильма
      * @return Статус операции (true или false)
      */
     @Override
     public boolean delete(long id) {
         String deleteFilm = "DELETE FROM films " +
-                            "WHERE film_id = ?";
+                "WHERE film_id = ?";
         return (jdbcTemplate.update(deleteFilm, id)) > 0;
     }
 
     /**
      * Получение фильма по id
+     *
      * @param id Id того фильма, который нужно получить
      * @return Фильм
      */
@@ -106,24 +110,129 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Получение списка популярных фильмов
+     *
      * @param count количество получаемых фильмов
      * @return Список фильмов
      */
     @Override
     public List<Film> getPopularFilms(int count) {
-        final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
-                "FROM films f " +
-                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
-                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
-                "GROUP BY f.film_id " +
-                "ORDER BY COUNT(fl.user_id) DESC " +
+        var sql = "SELECT f.film_id " +
+                "   , f.name " +
+                "   , f.description " +
+                "   , f.release_date " +
+                "   , f.duration " +
+                "   , f.rating_id " +
+                "   , r.rating_name " +
+                "   , f.rate " +
+                "FROM films f, " +
+                "   ratings r " +
+                "WHERE f.rating_id = r.rating_id " +
+                "ORDER BY f.rate, f.film_id DESC " +
                 "LIMIT ?";
 
-        return jdbcTemplate.query(findPopularFilmsWithLikes, this::mapRowToFilm, count);
+        return jdbcTemplate.query(sql, this::mapRowToFilm, count);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, long genreId) {
+        var sql = "WITH film_ids_by_genre_id AS ( " +
+                "   SELECT fg.film_id " +
+                "   FROM film_genre fg " +
+                "   WHERE fg.genre_id = " + genreId +
+                "), " +
+                "films_by_film_ids AS ( " +
+                "   SELECT f.film_id " +
+                "       , f.name " +
+                "       , f.description " +
+                "       , f.release_date " +
+                "       , f.duration " +
+                "       , f.rating_id " +
+                "       , r.rating_name " +
+                "       , f.rate " +
+                "   FROM film_ids_by_genre_id fi, " +
+                "       films f, " +
+                "       ratings r " +
+                "   WHERE fi.film_id = f.film_id " +
+                "   AND f.rating_id = r.rating_id " +
+                ") " +
+                "SELECT ff.* " +
+                "FROM films_by_film_ids ff " +
+                "ORDER BY ff.rate DESC " +
+                "LIMIT " + count;
+
+        return jdbcTemplate.query(sql, this::mapRowToFilm);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, int year) {
+        var sql = "WITH film_ids_by_year AS ( " +
+                "   SELECT f.film_id " +
+                "   FROM films f " +
+                "   WHERE YEAR(f.release_date) = " + year +
+                "), " +
+                "films_by_film_ids AS ( " +
+                "   SELECT f.film_id " +
+                "       , f.name " +
+                "       , f.description " +
+                "       , f.release_date " +
+                "       , f.duration " +
+                "       , f.rating_id " +
+                "       , r.rating_name " +
+                "       , f.rate " +
+                "   FROM film_ids_by_year fi, " +
+                "       films f, " +
+                "       ratings r " +
+                "   WHERE fi.film_id = f.film_id " +
+                "   AND f.rating_id = r.rating_id " +
+                ") " +
+                "SELECT * " +
+                "FROM films_by_film_ids ff " +
+                "ORDER BY ff.rate DESC " +
+                "LIMIT " + count;
+
+        return jdbcTemplate.query(sql, this::mapRowToFilm);
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, long genreId, int year) {
+        var sql = "WITH film_ids_by_genre_ids AS ( " +
+                "   SELECT fg.film_id " +
+                "   FROM film_genre fg " +
+                "   WHERE fg.genre_id = " + genreId +
+                "), " +
+                "film_ids_by_year AS ( " +
+                "   SELECT f.film_id " +
+                "   FROM film_ids_by_genre_ids fi, " +
+                "       films f " +
+                "   WHERE fi.film_id = f.film_id " +
+                "   AND YEAR(f.release_date) = " + year +
+                "), " +
+                "films_by_film_ids AS ( " +
+                "   SELECT f.film_id " +
+                "       , f.name " +
+                "       , f.description " +
+                "       , f.release_date " +
+                "       , f.duration " +
+                "       , f.rating_id " +
+                "       , r.rating_name " +
+                "       , f.rate " +
+                "   FROM film_ids_by_year fi, " +
+                "       films f, " +
+                "       ratings r " +
+                "   WHERE fi.film_id = f.film_id " +
+                "   AND f.rating_id = r.rating_id " +
+                ") " +
+                "SELECT * " +
+                "FROM films_by_film_ids ff " +
+                "ORDER BY ff.rate DESC " +
+                "LIMIT " + count;
+
+        return jdbcTemplate.query(sql, this::mapRowToFilm);
     }
 
     /**
      * Добавление лайка фильму
+     *
      * @param userId пользователь
      * @param filmId фильм
      * @return Статус операции (true или false)
@@ -137,6 +246,7 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Удаление лайка фильма
+     *
      * @param userId пользователь
      * @param filmId фильм
      * @return Статус операции (true или false)
@@ -158,6 +268,7 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .genres(getSetGenres(resultSet))
+                .rate(resultSet.getInt("rate"))
                 .build();
     }
 
@@ -179,7 +290,7 @@ public class FilmDbStorage implements FilmStorage {
                 return film;
             }
             String insertFilmGenre = "INSERT INTO film_genre (film_id, genre_id) " +
-                                        "VALUES(?, ?)";
+                    "VALUES(?, ?)";
             film.getGenres().stream()
                     .map(Genre::getId)
                     .distinct()

@@ -15,8 +15,8 @@ import java.util.Map;
 @Slf4j
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
-    private int filmId = 1;
     private final Map<Long, Film> films = new HashMap<>();
+    private int filmId = 1;
 
     @Override
     public List<Film> findAll() {
@@ -40,8 +40,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (!films.containsKey(film.getId())) {
-            log.error("Фильм с id: " + film.getId() +" не найден");
-            throw new FilmIdUnknownException("Фильм с id: " + film.getId() +" не найден");
+            log.error("Фильм с id: " + film.getId() + " не найден");
+            throw new FilmIdUnknownException("Фильм с id: " + film.getId() + " не найден");
         }
 
         log.info("Put \"/films\" " + film);
@@ -57,7 +57,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Film getFilm(long id) {
         if (!films.containsKey(id)) {
-            throw new FilmIdUnknownException("Фильм с id: " + id +" не найден");
+            throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
         }
         log.info("Get \"/films\" " + id);
         return films.get(id);
@@ -65,6 +65,21 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilms(int count) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, long genreId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, int year) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, long genreId, int year) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
     }
 

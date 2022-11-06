@@ -2,7 +2,14 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -26,8 +33,12 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> popular (@RequestParam(defaultValue = "10") final int count){
-        return filmService.getPopular(count);
+    public List<Film> getPopular(
+            @RequestParam(defaultValue = "10", required = false) int count,
+            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer year
+    ) {
+        return filmService.getPopular(count, genreId, year);
     }
 
     @GetMapping("/films/{id}")
@@ -46,7 +57,7 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public boolean addLike (@PathVariable final long id, @PathVariable final long userId) {
+    public boolean addLike(@PathVariable final long id, @PathVariable final long userId) {
         return filmService.addLike(id, userId);
     }
 
