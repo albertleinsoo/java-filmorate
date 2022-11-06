@@ -65,11 +65,23 @@ public class FilmService {
         return filmStorage.deleteLike(userId, id);
     }
 
-    public List<Film> getPopular(final int count) {
-        return filmStorage.getPopularFilms(count);
+    public List<Film> getPopular(int count, Long genreId, Integer year) {
+        List<Film> films;
+
+        if (genreId == null && year == null) {
+            films = filmStorage.getPopularFilms(count);
+        } else if (genreId != null && year != null) {
+            films = filmStorage.getPopularFilms(count, genreId, year);
+        } else if (genreId != null) {
+            films = filmStorage.getPopularFilms(count, genreId);
+        } else {
+            films = filmStorage.getPopularFilms(count, year);
+        }
+
+        return films;
     }
 
-    private void validateFilmDate (Film film) {
+    private void validateFilmDate(Film film) {
         try {
             if (film.getName().isEmpty()) {
                 throw new ValidationException("Нет названия фильма");

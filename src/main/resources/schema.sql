@@ -24,6 +24,7 @@ create table FILMS
     RELEASE_DATE DATE              not null,
     DURATION     INTEGER           not null,
     RATING_ID    BIGINT,
+    RATE         INTEGER,
     constraint FOREIGN_KEY_NAME
         foreign key (RATING_ID) references RATINGS
 );
