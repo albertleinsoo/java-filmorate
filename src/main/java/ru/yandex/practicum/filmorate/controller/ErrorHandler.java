@@ -46,7 +46,6 @@ public class ErrorHandler {
         return e.getMessage();
     }
 
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleRatingIdUnknownException(final RatingIdException e) {
@@ -70,5 +69,22 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleUserLoginAlreadyExistsException(final UserLoginAlreadyExistsException e) {
         return e.getMessage();
+    }
+
+    @ExceptionHandler({DislikeNotExistsException.class,
+            ReviewNotExistsException.class,
+            LikeNotExistsException.class})
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleNotFoundExceptions(final RuntimeException ex) {
+        return ex.getMessage();
+    }
+
+    @ExceptionHandler({DislikeAlreadyExistsException.class,
+            ReviewAlreadyExistsException.class,
+            LikeAlreadyExistsException.class,
+            NullUserOrFilmIdException.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleAlreadyExistsExceptions(final RuntimeException ex) {
+        return ex.getMessage();
     }
 }
