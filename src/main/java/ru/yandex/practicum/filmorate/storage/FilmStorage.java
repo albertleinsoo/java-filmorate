@@ -31,5 +31,5 @@ public interface FilmStorage {
 
     boolean deleteLike(long userId, long filmId);
 
-    Map<Long, Long> getAllLikes();
+    List<Long[]> getAllLikes();
 }

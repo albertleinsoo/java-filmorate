@@ -93,6 +93,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.deleteLike\" не реализован");
     }
 
+    @Override
+    public List<Long[]> getAllLikes() {
+        return null;
+    }
+
     private int generateFilmId() {
         return filmId++;
     }

@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -261,12 +262,15 @@ public class FilmDbStorage implements FilmStorage {
         return (jdbcTemplate.update(deleteFilmLike, filmId, userId)) > 0;
     }
 
-    public Map<Long, Long> getAllLikes() {
+    public List<Long[]> getAllLikes() {
 
-        HashMap<Long, Long> allLikes = new HashMap<>();
+        List <Long[]> allLikes = new ArrayList<>();
         jdbcTemplate.query("select film_id, user_id from film_likes", (ResultSet rs) -> {
             while (rs.next()) {
-                allLikes.put(rs.getLong("film_id"), rs.getLong("user_id"));
+                Long[] like = new Long[2];
+                like[0] = rs.getLong("film_id");
+                like[1] = rs.getLong("user_id");
+                allLikes.add(like);
             }
         });
         return allLikes;
