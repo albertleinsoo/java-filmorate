@@ -12,7 +12,9 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
@@ -257,6 +259,17 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE film_id = ? " +
                 "AND user_id = ?";
         return (jdbcTemplate.update(deleteFilmLike, filmId, userId)) > 0;
+    }
+
+    public Map<Long, Long> getAllLikes() {
+
+        HashMap<Long, Long> allLikes = new HashMap<>();
+        jdbcTemplate.query("select film_id, user_id from film_likes", (ResultSet rs) -> {
+            while (rs.next()) {
+                allLikes.put(rs.getLong("film_id"), rs.getLong("user_id"));
+            }
+        });
+        return allLikes;
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
