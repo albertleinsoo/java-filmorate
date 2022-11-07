@@ -14,7 +14,7 @@ public interface FilmStorage {
 
     Film update(Film film);
 
-    boolean delete(long id);
+    void deleteFilm(long filmId);
 
     Film getFilm(long id);
 
@@ -29,5 +29,7 @@ public interface FilmStorage {
     boolean addLike(long id, long userID);
 
     boolean deleteLike(long userId, long filmId);
+
+    boolean isFilmExists(long filmId);
 
 }

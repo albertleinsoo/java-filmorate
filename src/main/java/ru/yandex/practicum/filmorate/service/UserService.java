@@ -26,7 +26,7 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public List<User> findAll(){
+    public List<User> findAll() {
         return userStorage.findAll();
     }
 
@@ -50,7 +50,8 @@ public class UserService {
 
     /**
      * Добавление пользователя в список друзей
-     * @param id Id пользователя, который добавляет в друзья
+     *
+     * @param id       Id пользователя, который добавляет в друзья
      * @param friendId Id пользователя, которого добавляют в друзья
      */
     public void addFriend(final long id, final long friendId) {
@@ -66,7 +67,8 @@ public class UserService {
 
     /**
      * Удаление пользователя из списка друзей
-     * @param id Id пользователя, который удаляет в друга
+     *
+     * @param id       Id пользователя, который удаляет в друга
      * @param friendId Id пользователя, которого удаляют из друзей
      */
     public void deleteFriend(final long id, final long friendId) {
@@ -82,6 +84,7 @@ public class UserService {
 
     /**
      * Удаление пользователя
+     *
      * @param userId Id пользователя
      */
     public void deleteUser(long userId) {
@@ -93,6 +96,7 @@ public class UserService {
 
     /**
      * Друзья пользователя
+     *
      * @param id Id пользователя
      * @return Список друзей пользователя
      */
@@ -106,7 +110,8 @@ public class UserService {
 
     /**
      * Список общих друзей с пользователем
-     * @param id id пользователя
+     *
+     * @param id      id пользователя
      * @param otherId id другого пользователя, с которым нужно найти общих друзей
      * @return Список пользователей, которые являются общими друзьями пользователей id и otherId
      */
