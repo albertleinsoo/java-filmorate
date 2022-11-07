@@ -42,6 +42,13 @@ public class FilmService {
         return filmStorage.getFilm(id);
     }
 
+    public void deleteFilm(long filmId) {
+        if (!filmStorage.isFilmExists(filmId)) {
+            throw new FilmIdUnknownException("Фильм с id: " + filmId + " не найден");
+        }
+        filmStorage.deleteFilm(filmId);
+    }
+
     public boolean addLike(final long id, final long userId) {
         if (id <= 0) {
             throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");

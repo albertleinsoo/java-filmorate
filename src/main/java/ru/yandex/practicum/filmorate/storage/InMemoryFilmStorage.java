@@ -51,7 +51,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean delete(long id) {
+    public void deleteFilm(long filmId) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.delete\" ещё не реализован");
     }
 
@@ -91,6 +91,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public boolean deleteLike(long userId, long filmId) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.deleteLike\" не реализован");
+    }
+
+    @Override
+    public boolean isFilmExists(long filmId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.isFilmExists\" не реализован");
     }
 
     private int generateFilmId() {

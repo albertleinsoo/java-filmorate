@@ -80,15 +80,13 @@ public class FilmDbStorage implements FilmStorage {
     /**
      * Удаление фильма
      *
-     * @param id Id удаляемого фильма
-     * @return Статус операции (true или false)
+     * @param filmId Id удаляемого фильма
      */
-    @Override
-    public boolean delete(long id) {
-        String deleteFilm = "DELETE FROM films " +
-                "WHERE film_id = ?";
-        return (jdbcTemplate.update(deleteFilm, id)) > 0;
-    }
+   @Override
+   public void deleteFilm(long filmId) {
+       String sql = "DELETE FROM films WHERE film_id = ?";
+       jdbcTemplate.update(sql, filmId);
+   }
 
     /**
      * Получение фильма по id
@@ -257,6 +255,12 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE film_id = ? " +
                 "AND user_id = ?";
         return (jdbcTemplate.update(deleteFilmLike, filmId, userId)) > 0;
+    }
+
+    @Override
+    public boolean isFilmExists(long filmId) {
+        String sql = "SELECT 1 FROM films WHERE film_id = ? LIMIT 1";
+        return Boolean.TRUE.equals(jdbcTemplate.query(sql, ResultSet::next, filmId));
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

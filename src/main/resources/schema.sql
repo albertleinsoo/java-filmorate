@@ -77,9 +77,9 @@ create table USER_FRIENDS
     constraint USER_FRIENDS_UK
         unique (USER_ID, FRIEND_ID),
     constraint USER_FRIENDS_USERS_USER_ID_FK
-        foreign key (USER_ID) references USERS,
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
     constraint USER_FRIENDS_USERS_USER_ID_FK_2
-        foreign key (FRIEND_ID) references USERS
+        foreign key (FRIEND_ID) references USERS ON DELETE CASCADE
 );
 
 create table if not exists REVIEWS
@@ -94,9 +94,9 @@ create table if not exists REVIEWS
     constraint USER_FILM_UK
         unique (USER_ID, FILM_ID),
     constraint REVIEWS_USER_ID_USERS_USER_ID_FK
-        foreign key (USER_ID) references USERS,
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
     constraint REVIEWS_FILM_ID_FILMS_FILM_ID_FK
-        foreign key (FILM_ID) references FILMS
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE
 );
 
 create table if not exists REVIEWS_LIKES
