@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
 
 @Slf4j
@@ -228,6 +229,27 @@ public class FilmDbStorage implements FilmStorage {
                 "LIMIT " + count;
 
         return jdbcTemplate.query(sql, this::mapRowToFilm);
+    }
+
+    /**
+     * Получение списка общих с другом фильмов
+     * @param userId идентификатор пользователя, запрашивающего информацию
+     * @param friendId идентификатор пользователя, с которым необходимо сравнить список фильмов
+     * @return Список фильмов
+     */
+    @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        String sql = "SELECT f.*, r.rating_name FROM films f " +
+                "LEFT JOIN film_likes AS fl ON f.film_id = fl.film_id " +
+                "LEFT JOIN ratings AS r ON f.rating_id = r.rating_id " +
+                "WHERE f.film_id IN (SELECT DISTINCT fl1.film_id " +
+                "                   FROM film_likes AS fl1 " +
+                "                   JOIN film_likes AS fl2 ON fl1.film_id = fl2.film_id " +
+                "                   WHERE fl1.user_id = ? AND fl2.user_id = ?) " +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(DISTINCT fl.user_id) DESC";
+
+        return jdbcTemplate.query(sql, this::mapRowToFilm, userId, friendId);
     }
 
     /**

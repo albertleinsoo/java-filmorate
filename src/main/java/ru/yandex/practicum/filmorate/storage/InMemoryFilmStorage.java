@@ -84,6 +84,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getCommonFilms\" не реализован");
+    }
+
+    @Override
     public boolean addLike(long userId, long filmId) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.addLike\" не реализован");
     }
