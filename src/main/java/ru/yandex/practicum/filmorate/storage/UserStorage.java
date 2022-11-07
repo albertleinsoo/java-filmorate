@@ -26,4 +26,6 @@ public interface UserStorage {
     boolean deleteFriend(long id, long friendId);
 
     Set<Long> getFriendsIdListByUserId(long id);
+
+    boolean isUserExists(long userId);
 }

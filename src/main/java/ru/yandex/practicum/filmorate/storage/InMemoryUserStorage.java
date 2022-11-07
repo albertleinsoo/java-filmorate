@@ -101,6 +101,11 @@ public class InMemoryUserStorage implements UserStorage {
         throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.getFriendsIdListByUserId\" ещё не реализован");
     }
 
+    @Override
+    public boolean isUserExists(long userId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryUserStorage.isUserExists\" ещё не реализован");
+    }
+
     /**
      * Генерирует новый id для пользователя
      * @return сгенерированный id пользователя

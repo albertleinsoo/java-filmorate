@@ -169,6 +169,12 @@ public class UserDbStorage implements UserStorage {
         return new HashSet<>(jdbcTemplate.query(findFriendsIdByUserId, (rs, friend_id) -> rs.getLong("friend_id"), id));
     }
 
+    @Override
+    public boolean isUserExists(long userId) {
+        String sql = "SELECT 1 FROM users WHERE user_id = ? LIMIT 1";
+        return Boolean.TRUE.equals(jdbcTemplate.query(sql, ResultSet::next, userId));
+    }
+
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("user_id"))
