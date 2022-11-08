@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
+
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -19,11 +21,12 @@ import java.util.List;
 @Qualifier("filmDbStorage")
 @RequiredArgsConstructor
 public class FilmDbStorage implements FilmStorage {
-
     private final JdbcTemplate jdbcTemplate;
 
+    private final DirectorDbStorage directorDbStorage;
+
     /**
-     * @return  Список всех фильмов
+     * @return Список всех фильмов
      */
     @Override
     public List<Film> findAll() {
@@ -35,6 +38,7 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Добавление фильма
+     *
      * @param film Добавляемый фильм
      * @return Добавленный фильм с обновлённым списком жанров
      */
@@ -45,16 +49,20 @@ public class FilmDbStorage implements FilmStorage {
                 .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
 
-        return updateGenres(film);
+        film.setDirectors(updateDirectors(film).getDirectors());
+        film.setGenres(updateGenres(film).getGenres());
+        return film;
     }
 
     /**
      * Обновление фильма
+     *
      * @param film Обновляемый фильм
-     * @return Фильм с обновлённым списком жанров
+     * @return Фильм с обновлённым списком жанров и режжисеров
      */
     @Override
     public Film update(Film film) {
+
         final String updateFilm = "UPDATE films SET " +
                 "name = ?, description = ?, release_date = ?, duration = ?, rating_id = ? " +
                 "WHERE film_id = ?";
@@ -67,28 +75,39 @@ public class FilmDbStorage implements FilmStorage {
                 , film.getMpa().getId()
                 , film.getId());
 
+
         final String DELETE_GENRES_BY_FILM_ID = "DELETE FROM film_genre " +
                 "WHERE film_id = ?";
+        final String DELETE_DIRECTORS_BY_FILM_ID = "DELETE FROM film_director " +
+                "WHERE film_id = ?";
+
 
         jdbcTemplate.update(DELETE_GENRES_BY_FILM_ID, film.getId());
+        jdbcTemplate.update(DELETE_DIRECTORS_BY_FILM_ID, film.getId());
 
-        return updateGenres(film);
+        film.setDirectors(updateDirectors(film).getDirectors());
+        film.setGenres(updateGenres(film).getGenres());
+
+
+        return film;
     }
 
     /**
      * Удаление фильма
+     *
      * @param id Id удаляемого фильма
      * @return Статус операции (true или false)
      */
     @Override
     public boolean delete(long id) {
         String deleteFilm = "DELETE FROM films " +
-                            "WHERE film_id = ?";
+                "WHERE film_id = ?";
         return (jdbcTemplate.update(deleteFilm, id)) > 0;
     }
 
     /**
      * Получение фильма по id
+     *
      * @param id Id того фильма, который нужно получить
      * @return Фильм
      */
@@ -96,16 +115,19 @@ public class FilmDbStorage implements FilmStorage {
     public Film getFilm(long id) {
         final String findFilmById = "SELECT FILMS.*, RATINGS.RATING_NAME " +
                 "FROM films, RATINGS " +
-                "WHERE FILMS.RATING_ID = RATINGS.RATING_ID AND film_id = ?";
+                "WHERE FILMS.RATING_ID = RATINGS.RATING_ID AND film_id = ?;";
         Film film = jdbcTemplate.queryForObject(findFilmById, this::mapRowToFilm, id);
         if (film.getGenres().size() == 0) {
             film.setGenres(null);
+
         }
+
         return film;
     }
 
     /**
      * Получение списка популярных фильмов
+     *
      * @param count количество получаемых фильмов
      * @return Список фильмов
      */
@@ -124,6 +146,7 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Добавление лайка фильму
+     *
      * @param userId пользователь
      * @param filmId фильм
      * @return Статус операции (true или false)
@@ -137,6 +160,7 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Удаление лайка фильма
+     *
      * @param userId пользователь
      * @param filmId фильм
      * @return Статус операции (true или false)
@@ -158,6 +182,7 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(resultSet.getDate("release_date").toLocalDate())
                 .duration(resultSet.getInt("duration"))
                 .genres(getSetGenres(resultSet))
+                .directors(getSetDirectors(resultSet))
                 .build();
     }
 
@@ -179,11 +204,25 @@ public class FilmDbStorage implements FilmStorage {
                 return film;
             }
             String insertFilmGenre = "INSERT INTO film_genre (film_id, genre_id) " +
-                                        "VALUES(?, ?)";
+                    "VALUES(?, ?)";
             film.getGenres().stream()
                     .map(Genre::getId)
                     .distinct()
                     .forEach(id -> jdbcTemplate.update(insertFilmGenre, film.getId(), id));
+        }
+        return getFilm(film.getId());
+    }
+
+    private Film updateDirectors(Film film) {
+        if (film.getDirectors() != null) {
+            if (film.getDirectors().size() == 0) {
+                return film;
+            }
+            String insertFilmDirector = "INSERT INTO film_director (film_id, director_id) VALUES(?, ?);";
+            film.getDirectors().stream()
+                    .map(Director::getId)
+                    .distinct()
+                    .forEach(id -> jdbcTemplate.update(insertFilmDirector, film.getId(), id));
         }
         return getFilm(film.getId());
     }
@@ -196,8 +235,42 @@ public class FilmDbStorage implements FilmStorage {
                 "WHERE fg.film_id = ?";
 
         long filmId = rs.getLong("film_id");
-
         return jdbcTemplate.query(findGenreByFilmId, this::mapRowToGenre, filmId);
+    }
+
+    private List<Director> getSetDirectors(ResultSet rs) throws SQLException {
+        final String findDirectorByFilmId = "SELECT fd.director_id, " +
+                "d.name " +
+                "FROM film_director fd " +
+                "LEFT JOIN director d ON fd.director_id = d.director_id " +
+                "WHERE fd.film_id = ?";
+
+        long filmId = rs.getLong("film_id");
+        return jdbcTemplate.query(findDirectorByFilmId, this::mapRowToDirector, filmId);
+    }
+
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        directorDbStorage.checkDirector(directorId);
+
+        final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
+                "FROM films f " +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
+                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
+                "LEFT JOIN FILM_DIRECTOR fd on fd.film_id = f.film_id " +
+                "WHERE fd.DIRECTOR_ID = ? " +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(fl.user_id) DESC;";
+
+        final String findPopularFilmsWithYear = "SELECT f.*, R.RATING_NAME " +
+                "FROM films f " +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
+                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
+                "LEFT JOIN FILM_DIRECTOR fd on fd.film_id = f.film_id " +
+                "WHERE fd.DIRECTOR_ID = ? " +
+                "GROUP BY f.film_id " +
+                "ORDER BY f.RELEASE_DATE;";
+
+        return jdbcTemplate.query(sortBy.equals("year") ? findPopularFilmsWithYear : findPopularFilmsWithLikes, this::mapRowToFilm, directorId);
     }
 
     private Rating mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {
@@ -210,6 +283,13 @@ public class FilmDbStorage implements FilmStorage {
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
         return Genre.builder()
                 .id(resultSet.getLong("genre_id"))
+                .name(resultSet.getString("name"))
+                .build();
+    }
+
+    private Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {
+        return Director.builder()
+                .id(resultSet.getLong("director_id"))
                 .name(resultSet.getString("name"))
                 .build();
     }

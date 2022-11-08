@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
 import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.ValidationException;
@@ -18,9 +19,11 @@ import java.util.List;
 public class FilmService {
 
     private FilmStorage filmStorage;
+    private FilmDbStorage filmDbStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, FilmDbStorage filmDbStorage) {
+        this.filmDbStorage = filmDbStorage;
         this.filmStorage = filmStorage;
     }
 
@@ -69,7 +72,11 @@ public class FilmService {
         return filmStorage.getPopularFilms(count);
     }
 
-    private void validateFilmDate (Film film) {
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        return filmDbStorage.getDirectorFilmsSortedBy(directorId, sortBy);
+    }
+
+    private void validateFilmDate(Film film) {
         try {
             if (film.getName().isEmpty()) {
                 throw new ValidationException("Нет названия фильма");

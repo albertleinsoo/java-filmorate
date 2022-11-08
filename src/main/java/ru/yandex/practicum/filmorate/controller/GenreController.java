@@ -39,7 +39,7 @@ public class GenreController {
      * @return Жанр
      */
     @GetMapping("/{id}")
-    public Genre getUserById(@Valid @PathVariable int id) {
+    public Genre getGenreById(@Valid @PathVariable int id) {
         return genreService.getGenreById(id);
     }
 }

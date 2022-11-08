@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS;
+DROP TABLE IF EXISTS USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS, DIRECTOR, FILM_DIRECTOR;
 
 create table GENRE
 (
@@ -79,4 +79,26 @@ create table USER_FRIENDS
         foreign key (USER_ID) references USERS,
     constraint USER_FRIENDS_USERS_USER_ID_FK_2
         foreign key (FRIEND_ID) references USERS
+);
+
+create table DIRECTOR
+(
+    DIRECTOR_ID BIGINT auto_increment
+        primary key,
+    NAME     CHARACTER VARYING
+        unique
+);
+
+create table FILM_DIRECTOR
+(
+    FILM_DIRECTOR_ID BIGINT auto_increment
+        primary key,
+    FILM_ID       BIGINT not null,
+    DIRECTOR_ID      BIGINT not null,
+    constraint FILM_DIRECTOR_UK
+        unique (FILM_ID, DIRECTOR_ID),
+    constraint FILM_DIRECTOR_FILMS_FILM_ID_FK
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
+    constraint FILM_DIRECTOR_DIRECTOR_DIRECTOR_ID_FK
+        foreign key (DIRECTOR_ID) references DIRECTOR ON DELETE CASCADE
 );

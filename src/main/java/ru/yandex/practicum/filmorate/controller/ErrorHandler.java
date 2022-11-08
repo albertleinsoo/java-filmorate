@@ -61,6 +61,13 @@ public class ErrorHandler {
 
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleDirectorIdUnknownException(final DirectorIdExeption e) {
+        return e.getMessage();
+    }
+
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleThrowable(final Throwable e) {
         return e.getMessage();
