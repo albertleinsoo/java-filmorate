@@ -32,4 +32,6 @@ public interface FilmStorage {
     boolean deleteLike(long userId, long filmId);
 
     List<Long[]> getAllLikes();
+
+    boolean checkUserExist(Long id);
 }
