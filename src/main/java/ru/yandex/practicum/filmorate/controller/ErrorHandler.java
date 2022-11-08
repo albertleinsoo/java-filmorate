@@ -87,4 +87,10 @@ public class ErrorHandler {
     public String handleAlreadyExistsExceptions(final RuntimeException ex) {
         return ex.getMessage();
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public String handleDirectorIdUnknownException(final DirectorIdExeption e) {
+        return e.getMessage();
+    }
 }

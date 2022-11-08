@@ -19,6 +19,7 @@ public class FilmService {
 
     private FilmStorage filmStorage;
 
+
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
@@ -86,6 +87,10 @@ public class FilmService {
         }
 
         return films;
+    }
+
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        return filmStorage.getDirectorFilmsSortedBy(directorId, sortBy);
     }
 
     private void validateFilmDate(Film film) {
