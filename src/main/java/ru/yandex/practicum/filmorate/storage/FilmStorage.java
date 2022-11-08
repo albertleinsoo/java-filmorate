@@ -33,5 +33,4 @@ public interface FilmStorage {
 
     List<Long[]> getAllLikes();
 
-    boolean checkUserExist(Long id);
 }

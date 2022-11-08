@@ -98,11 +98,6 @@ public class InMemoryFilmStorage implements FilmStorage {
         return null;
     }
 
-    @Override
-    public boolean checkUserExist(Long id) {
-        return false;
-    }
-
     private int generateFilmId() {
         return filmId++;
     }

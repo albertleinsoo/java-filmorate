@@ -267,18 +267,11 @@ public class FilmDbStorage implements FilmStorage {
             allLikes.add(like);
             while (rs.next()) {
                 like = new Long[]{rs.getLong("film_id"), rs.getLong("user_id")};
-                System.out.println("Like created: "+ Arrays.toString(like));
+                //System.out.println("Like created: "+ Arrays.toString(like));
                 allLikes.add(like);
             }
         });
         return allLikes;
-    }
-
-    @Override
-    public boolean checkUserExist(Long id) {
-        String sqlQuery = "select count(*) from users where user_id = ?";
-        Long result = jdbcTemplate.queryForObject(sqlQuery, Long.class, id);
-        return result == 1L;
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

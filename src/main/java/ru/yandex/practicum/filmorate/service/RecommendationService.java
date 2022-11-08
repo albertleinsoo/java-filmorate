@@ -27,7 +27,7 @@ public class RecommendationService {
 
     public List<Film> getRecommendedFilms(Long userId) {
         //film_id, user_id
-        if (!filmStorage.checkUserExist(userId)){
+        if (!userStorage.checkUserExist(userId)){
             throw new UserIdUnknownException(userId);
         }
 
