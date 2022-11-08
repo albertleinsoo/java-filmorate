@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
 import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.ValidationException;
@@ -18,11 +19,13 @@ import java.util.List;
 public class FilmService {
 
     private FilmStorage filmStorage;
+    private DirectorStorage directorStorage;
 
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,DirectorStorage directorStorage) {
         this.filmStorage = filmStorage;
+        this.directorStorage = directorStorage;
     }
 
     public List<Film> findAll() {
@@ -90,6 +93,7 @@ public class FilmService {
     }
 
     public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        directorStorage.checkDirector(directorId);
         return filmStorage.getDirectorFilmsSortedBy(directorId, sortBy);
     }
 

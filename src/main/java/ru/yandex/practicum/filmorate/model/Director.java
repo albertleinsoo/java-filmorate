@@ -10,7 +10,6 @@ import java.util.Map;
 @Builder
 public class Director {
     private long id;
-    @NotNull
     @NotBlank
     private String name;
 

@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.storage.DirectorDbStorage;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -15,7 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DirectorService {
     private final DirectorStorage directorStorage;
-    private final DirectorDbStorage directorDbStorage;
 
     /**
      * Возвращает список всех режжисеров
@@ -34,7 +34,7 @@ public class DirectorService {
      * @return Режжисер
      */
     public Director getDirectorById(long directorId) {
-        directorDbStorage.checkDirector(directorId);
+        directorStorage.checkDirector(directorId);
         log.debug("Получен режжисер с id: " + directorId);
         return directorStorage.getDirectorById(directorId);
     }
@@ -45,13 +45,13 @@ public class DirectorService {
     }
 
     public Director updateDirector(Director director) {
-        directorDbStorage.checkDirector(director.getId());
+        directorStorage.checkDirector(director.getId());
         log.debug("Обновлен режжисер с id: " + director.getId());
         return directorStorage.updateDirector(director);
     }
 
     public void deleteDirector(long directorId) {
-        directorDbStorage.checkDirector(directorId);
+        directorStorage.checkDirector(directorId);
         log.debug("Удален режжисер с id: " + directorId);
         directorStorage.deleteDirectorById(directorId);
     }

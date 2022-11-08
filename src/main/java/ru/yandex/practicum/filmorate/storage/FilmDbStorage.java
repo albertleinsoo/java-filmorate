@@ -22,7 +22,6 @@ import java.util.List;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    private final DirectorDbStorage directorDbStorage;
 
     /**
      * @return Список всех фильмов
@@ -48,7 +47,7 @@ public class FilmDbStorage implements FilmStorage {
                 .usingGeneratedKeyColumns("film_id");
         film.setId(simpleJdbcInsert.executeAndReturnKey(film.toMap()).longValue());
 
-        film.setDirectors(updateDirectors(film).getDirectors());
+        film.setDirectors(updateFilmDirectors(film).getDirectors());
         film.setGenres(updateGenres(film).getGenres());
         return film;
     }
@@ -84,7 +83,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(DELETE_GENRES_BY_FILM_ID, film.getId());
         jdbcTemplate.update(DELETE_DIRECTORS_BY_FILM_ID, film.getId());
 
-        film.setDirectors(updateDirectors(film).getDirectors());
+        film.setDirectors(updateFilmDirectors(film).getDirectors());
         film.setGenres(updateGenres(film).getGenres());
 
 
@@ -96,11 +95,11 @@ public class FilmDbStorage implements FilmStorage {
      *
      * @param filmId Id удаляемого фильма
      */
-   @Override
-   public void deleteFilm(long filmId) {
-       String sql = "DELETE FROM films WHERE film_id = ?";
-       jdbcTemplate.update(sql, filmId);
-   }
+    @Override
+    public void deleteFilm(long filmId) {
+        String sql = "DELETE FROM films WHERE film_id = ?";
+        jdbcTemplate.update(sql, filmId);
+    }
 
     /**
      * Получение фильма по id
@@ -318,8 +317,13 @@ public class FilmDbStorage implements FilmStorage {
         return getFilm(film.getId());
     }
 
-
-    private Film updateDirectors(Film film) {
+    /**
+     * Добавление режжисеров в фильм
+     *
+     * @param film фильм
+     * @return объект film с добавленными режжисерами
+     */
+    private Film updateFilmDirectors(Film film) {
         if (film.getDirectors() != null) {
             if (film.getDirectors().size() == 0) {
                 return film;
@@ -358,7 +362,6 @@ public class FilmDbStorage implements FilmStorage {
 
 
     public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
-        directorDbStorage.checkDirector(directorId);
 
         final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
                 "FROM films f " +
@@ -380,8 +383,6 @@ public class FilmDbStorage implements FilmStorage {
 
         return jdbcTemplate.query(sortBy.equals("year") ? findPopularFilmsWithYear : findPopularFilmsWithLikes, this::mapRowToFilm, directorId);
     }
-
-
 
 
     private Rating mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {

@@ -90,7 +90,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleDirectorIdUnknownException(final DirectorIdExeption e) {
+    public String handleDirectorIdUnknownException(final DirectorIdNotExistException e) {
         return e.getMessage();
     }
 }

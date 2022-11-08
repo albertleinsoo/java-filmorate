@@ -38,7 +38,7 @@ public class DirectorController {
      * @return режжисер
      */
     @GetMapping("/{id}")
-    public Director getDirectorById(@Valid @PathVariable long id) {
+    public Director getDirectorById(@PathVariable long id) {
         return directorService.getDirectorById(id);
     }
 
