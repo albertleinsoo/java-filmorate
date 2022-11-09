@@ -115,6 +115,7 @@ public class RecommendationService {
 
         if (recommendedFilmsId.isEmpty()) {
             log.info("No recommendations there are for the user");
+            return new ArrayList<>();
         }
 
         return filmStorage.getFilmsByIdList(recommendedFilmsId);
