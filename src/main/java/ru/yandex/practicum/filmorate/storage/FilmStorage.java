@@ -33,4 +33,5 @@ public interface FilmStorage {
 
     List<Long[]> getAllLikes();
 
+    List<Film> getFilmsByIdList(List<Long> recommendedFilmsId);
 }

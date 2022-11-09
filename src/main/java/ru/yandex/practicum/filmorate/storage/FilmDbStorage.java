@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.model.Rating;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -272,6 +273,19 @@ public class FilmDbStorage implements FilmStorage {
             }
         });
         return allLikes;
+    }
+
+    public List<Film> getFilmsByIdList (List <Long> filmIds){
+        final String inSql = filmIds.stream().map(Object::toString)
+                .collect(Collectors.joining(","));
+        final String sqlQuery = "select films.*, ratings.rating_name" +
+                " from films, ratings " +
+                "where films.rating_id = ratings.rating_id and film_id in (" + inSql + ")";
+
+        List <Film> recommendedFilms = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+
+        log.info("Recommendations list returned");
+        return recommendedFilms;
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

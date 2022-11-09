@@ -16,8 +16,8 @@ import static java.util.stream.Collectors.toList;
 @Slf4j
 @Service
 public class RecommendationService {
-    private FilmStorage filmStorage;
-    private UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
     public RecommendationService(@Qualifier("filmDbStorage") FilmStorage filmStorage, @Qualifier("userDbStorage") UserStorage userStorage) {
@@ -38,7 +38,7 @@ public class RecommendationService {
             return new ArrayList<>();
         }
 
-        return cookRecommendationList(filmStorage.getAllLikes(), userId);
+        return cookRecommendationList(allLikes, userId);
     }
 
     private List<Film> cookRecommendationList(List<Long[]> allLikes, Long userId) {
@@ -102,27 +102,21 @@ public class RecommendationService {
         return sortedByCommonLikes;
     }
 
-    private List<Film> cookRelevantFilmsList(List<Long> commonLikesUsers, List<Long> userLikes, List<Long[]> allLikes) {
-        List<Film> recommended = new ArrayList<>();
+    private List<Film> cookRelevantFilmsList (List<Long> commonLikesUsers, List<Long> userLikes, List<Long[]> allLikes) {
+        List<Long> recommendedFilmsId = new ArrayList<>();
         for (Long id : commonLikesUsers) {
             List<Long> userFavourites = getUserFavourites(allLikes, id);
             for (Long filmId : userFavourites) {
-                if (!userLikes.contains(filmId) && !recommended.contains(filmId)) {
-                    recommended.add(filmStorage.getFilm(filmId));
+                if (!userLikes.contains(filmId) && !recommendedFilmsId.contains(filmId)) {
+                    recommendedFilmsId.add(filmId);
                 }
             }
         }
 
-        if (recommended.isEmpty()) {
+        if (recommendedFilmsId.isEmpty()) {
             log.info("No recommendations there are for the user");
         }
 
-        log.info("Recommendations list sent");
-        return recommended;
+        return filmStorage.getFilmsByIdList(recommendedFilmsId);
     }
 }
-
-/*System.out.println("Список всех лайков: ");
-        for (Long[] like : allLikes){
-            System.out.println(Arrays.toString(like));
-        }*/
