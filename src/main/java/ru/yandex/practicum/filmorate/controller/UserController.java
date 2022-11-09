@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,6 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.EventService;
+
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.RecommendationService;
+
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -24,6 +29,7 @@ public class UserController {
 
     private final UserService userService;
     private final EventService eventService;
+    private final RecommendationService recommendationService;
 
     @GetMapping("/users")
     public List<User> findAll() {
@@ -75,4 +81,8 @@ public class UserController {
         userService.deleteUser(userId);
     }
 
+    @GetMapping("/users/{id}/recommendations")
+    public List<Film> getRecommendedFilms(@PathVariable long id) {
+        return recommendationService.getRecommendedFilms(id);
+    }
 }
