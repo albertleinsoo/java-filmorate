@@ -23,15 +23,7 @@ public class UserService {
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final EventService eventService;
-
-<<<<<<< HEAD
-=======
-    @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
-
->>>>>>> add-recommendations
+    
     public List<User> findAll() {
         return userStorage.findAll();
     }
