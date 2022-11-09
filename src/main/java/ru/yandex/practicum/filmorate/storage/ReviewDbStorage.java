@@ -90,6 +90,7 @@ public class ReviewDbStorage implements ReviewStorage {
         jdbcTemplate.update(SQL_ADD_LIKE, id, userId, true);
     }
 
+    @Override
     public void addDislike(long id, long userId) {
         final String SQL_ADD_DISLIKE = "INSERT INTO REVIEWS_LIKES (REVIEW_ID, USER_ID, LIKED) VALUES (?, ?, ?)";
         jdbcTemplate.update(SQL_ADD_DISLIKE, id, userId, false);
@@ -108,32 +109,49 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
     @Override
-    public boolean checkReview(Review review) {
-        String sqlQuery = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
+    public boolean isReviewExists(Review review) {
+        final String SQL_CHECK_REVIEW = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
                 "FROM REVIEWS WHERE USER_ID = ? AND FILM_ID = ?";
-        String result = jdbcTemplate.query(sqlQuery,
+        String result = jdbcTemplate.query(SQL_CHECK_REVIEW,
                 (rs, rn) -> rs.getString("result"),
                 review.getUserId(), review.getFilmId()).get(0);
         return Boolean.parseBoolean(result);
     }
 
     @Override
-    public boolean checkReview(long id) {
-        String sqlQuery = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
+    public boolean isReviewExists(long id) {
+        final String SQL_CHECK_REVIEW = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
                 "FROM REVIEWS WHERE REVIEW_ID = ?";
-        String result = jdbcTemplate.query(sqlQuery,
+        String result = jdbcTemplate.query(SQL_CHECK_REVIEW,
                 (rs, rn) -> rs.getString("result"),
                 id).get(0);
         return Boolean.parseBoolean(result);
     }
 
     @Override
-    public boolean checkLike(long reviewId, long userId, boolean liked) {
-        String sqlQuery = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
+    public boolean isLikeExists(long reviewId, long userId, boolean liked) {
+        final String SQL_CHECK_LIKE = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
                 "FROM REVIEWS_LIKES WHERE REVIEW_ID = ? AND USER_ID = ? AND LIKED = ?";
-        String result = jdbcTemplate.query(sqlQuery,
+        String result = jdbcTemplate.query(SQL_CHECK_LIKE,
                 (rs, rn) -> rs.getString("result"),
                 reviewId, userId, liked).get(0);
+        return Boolean.parseBoolean(result);
+    }
+
+
+    @Override
+    public boolean isUserExists(long userId) {
+        final String SQL_CHECK_USER = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
+                "FROM USERS WHERE USER_ID = ?";
+        String result = jdbcTemplate.query(SQL_CHECK_USER, (rs, rn) -> rs.getString("result"), userId).get(0);
+        return Boolean.parseBoolean(result);
+    }
+
+    @Override
+    public boolean isFilmExists(long filmId) {
+        final String SQL_CHECK_FILM = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
+                "FROM FILMS WHERE FILM_ID = ?";
+        String result = jdbcTemplate.query(SQL_CHECK_FILM, (rs, rn) -> rs.getString("result"), filmId).get(0);
         return Boolean.parseBoolean(result);
     }
 
@@ -146,19 +164,5 @@ public class ReviewDbStorage implements ReviewStorage {
                 .filmId(resultSet.getLong("FILM_ID"))
                 .useful(resultSet.getInt("USEFUL"))
                 .build();
-    }
-
-    public boolean checkUser(long userId) {
-        String sqlQuery = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
-                "FROM USERS WHERE USER_ID = ?";
-        String result = jdbcTemplate.query(sqlQuery, (rs, rn) -> rs.getString("result"), userId).get(0);
-        return Boolean.parseBoolean(result);
-    }
-
-    public boolean checkFilm(long filmId) {
-        String sqlQuery = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
-                "FROM FILMS WHERE FILM_ID = ?";
-        String result = jdbcTemplate.query(sqlQuery, (rs, rn) -> rs.getString("result"), filmId).get(0);
-        return Boolean.parseBoolean(result);
     }
 }

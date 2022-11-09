@@ -30,13 +30,13 @@ public class ReviewController {
 
     @PostMapping("/reviews")
     public Review create(@RequestBody @Valid Review review) {
-        log.trace("В контроллер {} получен запрос на создание пользователя {}", this.getClass(), review.toString());
+        log.trace("В контроллер {} получен запрос на создание отзыва {}", this.getClass(), review.toString());
         return reviewService.create(review);
     }
 
     @PutMapping("/reviews")
     public Review update(@RequestBody @Valid Review review) {
-        log.trace("В контроллер {} получен запрос на обновление пользователя {}", this.getClass(), review.toString());
+        log.trace("В контроллер {} получен запрос на обновление отзыва {}", this.getClass(), review.toString());
         return reviewService.update(review);
     }
 
