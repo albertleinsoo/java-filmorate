@@ -100,6 +100,11 @@ public class InMemoryFilmStorage implements FilmStorage {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.isFilmExists\" не реализован");
     }
 
+    @Override
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getDirectorFilmsSortedBy\" не реализован");
+    }
+
     private int generateFilmId() {
         return filmId++;
     }

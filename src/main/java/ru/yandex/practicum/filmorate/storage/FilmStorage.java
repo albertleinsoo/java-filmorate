@@ -32,4 +32,6 @@ public interface FilmStorage {
 
     boolean isFilmExists(long filmId);
 
+    List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy);
+
 }
