@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS REVIEWS_LIKES, REVIEWS, USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS;
+DROP TABLE IF EXISTS DIRECTOR,FILM_DIRECTOR, REVIEWS_LIKES, REVIEWS, USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS, EVENTS;
 
 create table GENRE
 (
@@ -24,6 +24,7 @@ create table FILMS
     RELEASE_DATE DATE              not null,
     DURATION     INTEGER           not null,
     RATING_ID    BIGINT,
+    RATE         INTEGER,
     constraint FOREIGN_KEY_NAME
         foreign key (RATING_ID) references RATINGS
 );
@@ -76,9 +77,9 @@ create table USER_FRIENDS
     constraint USER_FRIENDS_UK
         unique (USER_ID, FRIEND_ID),
     constraint USER_FRIENDS_USERS_USER_ID_FK
-        foreign key (USER_ID) references USERS,
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
     constraint USER_FRIENDS_USERS_USER_ID_FK_2
-        foreign key (FRIEND_ID) references USERS
+        foreign key (FRIEND_ID) references USERS ON DELETE CASCADE
 );
 
 create table if not exists REVIEWS
@@ -93,9 +94,9 @@ create table if not exists REVIEWS
     constraint USER_FILM_UK
         unique (USER_ID, FILM_ID),
     constraint REVIEWS_USER_ID_USERS_USER_ID_FK
-        foreign key (USER_ID) references USERS,
+        foreign key (USER_ID) references USERS ON DELETE CASCADE,
     constraint REVIEWS_FILM_ID_FILMS_FILM_ID_FK
-        foreign key (FILM_ID) references FILMS
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE
 );
 
 create table if not exists REVIEWS_LIKES
@@ -110,4 +111,44 @@ create table if not exists REVIEWS_LIKES
         foreign key (USER_ID) references USERS on delete cascade,
     constraint REVIEWS_LIKES_REVIEW_ID_REVIEWS_REVIEW_ID_FK
         foreign key (REVIEW_ID) references REVIEWS on delete cascade
+);
+
+CREATE TABLE events (
+	event_id BIGINT NOT NULL AUTO_INCREMENT,
+	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	user_id BIGINT NOT NULL,
+	operation ENUM('ADD', 'REMOVE', 'UPDATE') NOT NULL,
+	event_type ENUM('FRIEND', 'LIKE', 'REVIEW') NOT NULL,
+	entity_id BIGINT NOT NULL,
+
+	CONSTRAINT pk_events
+		PRIMARY KEY (event_id),
+
+	CONSTRAINT fk_events_user_id
+    	FOREIGN KEY (user_id)
+    	REFERENCES users (user_id)
+    	ON DELETE CASCADE
+);
+
+
+create table DIRECTOR
+(
+    DIRECTOR_ID BIGINT auto_increment
+        primary key,
+    NAME     CHARACTER VARYING
+        unique
+);
+
+create table FILM_DIRECTOR
+(
+    FILM_DIRECTOR_ID BIGINT auto_increment
+        primary key,
+    FILM_ID       BIGINT not null,
+    DIRECTOR_ID      BIGINT not null,
+    constraint FILM_DIRECTOR_UK
+        unique (FILM_ID, DIRECTOR_ID),
+    constraint FILM_DIRECTOR_FILMS_FILM_ID_FK
+        foreign key (FILM_ID) references FILMS ON DELETE CASCADE,
+    constraint FILM_DIRECTOR_DIRECTOR_DIRECTOR_ID_FK
+        foreign key (DIRECTOR_ID) references DIRECTOR ON DELETE CASCADE
 );

@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exeptions.FilmAlreadyExistException;
 import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
@@ -12,11 +13,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
 @Component
+@Qualifier("inMemoryFilmStorage")
+@Slf4j
 public class InMemoryFilmStorage implements FilmStorage {
-    private int filmId = 1;
     private final Map<Long, Film> films = new HashMap<>();
+    private int filmId = 1;
 
     @Override
     public List<Film> findAll() {
@@ -40,8 +42,8 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         if (!films.containsKey(film.getId())) {
-            log.error("Фильм с id: " + film.getId() +" не найден");
-            throw new FilmIdUnknownException("Фильм с id: " + film.getId() +" не найден");
+            log.error("Фильм с id: " + film.getId() + " не найден");
+            throw new FilmIdUnknownException("Фильм с id: " + film.getId() + " не найден");
         }
 
         log.info("Put \"/films\" " + film);
@@ -51,13 +53,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public boolean delete(long id) {
+    public void deleteFilm(long filmId) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.delete\" ещё не реализован");
     }
 
     public Film getFilm(long id) {
         if (!films.containsKey(id)) {
-            throw new FilmIdUnknownException("Фильм с id: " + id +" не найден");
+            throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
         }
         log.info("Get \"/films\" " + id);
         return films.get(id);
@@ -69,6 +71,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> getPopularFilms(int count, long genreId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, int year) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
+    public List<Film> getPopularFilms(int count, long genreId, int year) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getPopularFilms\" не реализован");
+    }
+
+    @Override
     public boolean addLike(long userId, long filmId) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.addLike\" не реализован");
     }
@@ -76,6 +93,16 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public boolean deleteLike(long userId, long filmId) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.deleteLike\" не реализован");
+    }
+
+    @Override
+    public boolean isFilmExists(long filmId) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.isFilmExists\" не реализован");
+    }
+
+    @Override
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getDirectorFilmsSortedBy\" не реализован");
     }
 
     private int generateFilmId() {
