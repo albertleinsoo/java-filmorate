@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
@@ -15,16 +15,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserService {
 
-    private UserStorage userStorage;
-
-    @Autowired
-    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
+    @Qualifier("userDbStorage")
+    private final UserStorage userStorage;
+    private final EventService eventService;
 
     public List<User> findAll() {
         return userStorage.findAll();
@@ -51,35 +49,41 @@ public class UserService {
     /**
      * Добавление пользователя в список друзей
      *
-     * @param id       Id пользователя, который добавляет в друзья
+     * @param userId   Id пользователя, который добавляет в друзья
      * @param friendId Id пользователя, которого добавляют в друзья
      */
-    public void addFriend(final long id, final long friendId) {
-        if (userStorage.getUser(id) == null) {
-            throw new UserIdUnknownException(id);
+    public void addFriend(final long userId, final long friendId) {
+        if (userStorage.getUser(userId) == null) {
+            throw new UserIdUnknownException(userId);
         }
         if (userStorage.getUser(friendId) == null) {
             throw new UserIdUnknownException(friendId);
         }
 
-        userStorage.addFriend(id, friendId);
+        var isFriendAdded = userStorage.addFriend(userId, friendId);
+        if (isFriendAdded) {
+            eventService.createAddFriendEvent(userId, friendId);
+        }
     }
 
     /**
      * Удаление пользователя из списка друзей
      *
-     * @param id       Id пользователя, который удаляет в друга
+     * @param userId   Id пользователя, который удаляет в друга
      * @param friendId Id пользователя, которого удаляют из друзей
      */
-    public void deleteFriend(final long id, final long friendId) {
-        if (userStorage.getUser(id) == null) {
-            throw new UserIdUnknownException(id);
+    public void deleteFriend(final long userId, final long friendId) {
+        if (userStorage.getUser(userId) == null) {
+            throw new UserIdUnknownException(userId);
         }
         if (userStorage.getUser(friendId) == null) {
             throw new UserIdUnknownException(friendId);
         }
 
-        userStorage.deleteFriend(id, friendId);
+        var isFriendDeleted = userStorage.deleteFriend(userId, friendId);
+        if (isFriendDeleted) {
+            eventService.createRemoveFriendEvent(userId, friendId);
+        }
     }
 
     /**
@@ -150,4 +154,5 @@ public class UserService {
             return false;
         }
     }
+
 }
