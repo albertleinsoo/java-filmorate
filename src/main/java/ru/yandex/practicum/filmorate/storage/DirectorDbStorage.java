@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exeptions.DirectorIdNotExistException;
+import ru.yandex.practicum.filmorate.exeptions.DirectorIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -66,7 +65,7 @@ public class DirectorDbStorage implements DirectorStorage {
         String sql = "SELECT COUNT(*) FROM DIRECTOR WHERE director_id = ?;";
         if (jdbcTemplate.queryForObject(sql, Integer.class, directorId) != 1) {
             log.warn("Режжисера с id " + directorId + " не существует");
-            throw new DirectorIdNotExistException(directorId);
+            throw new DirectorIdUnknownException(directorId);
         }
     }
 
