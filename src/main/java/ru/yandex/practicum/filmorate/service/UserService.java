@@ -23,7 +23,7 @@ public class UserService {
     @Qualifier("userDbStorage")
     private final UserStorage userStorage;
     private final EventService eventService;
-    
+
     public List<User> findAll() {
         return userStorage.findAll();
     }
