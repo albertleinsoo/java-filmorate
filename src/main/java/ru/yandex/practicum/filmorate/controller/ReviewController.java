@@ -42,7 +42,7 @@ public class ReviewController {
 
     @DeleteMapping("/reviews/{id}")
     public void delete(@PathVariable long id) {
-        log.trace("В контроллер {} получен запрос на удаление пользователя {}", this.getClass(), id);
+        log.trace("В контроллер {} получен запрос на удаление отзыва {}", this.getClass(), id);
         reviewService.delete(id);
     }
 
@@ -69,7 +69,7 @@ public class ReviewController {
 
     @PutMapping("/reviews/{id}/dislike/{userId}")
     public void addDislike(@PathVariable long id, @PathVariable long userId) {
-        log.trace("В контроллер {} получен запрос на добавление like фильму с id {} от пользователя с id {}",
+        log.trace("В контроллер {} получен запрос на добавление dislike фильму с id {} от пользователя с id {}",
                 this.getClass(),
                 id,
                 userId);

@@ -1,23 +1,29 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.*;
+import ru.yandex.practicum.filmorate.exeptions.DislikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.DislikeNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.LikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.LikeNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.NullUserOrFilmIdException;
+import ru.yandex.practicum.filmorate.exeptions.ReviewAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.ReviewNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
-    private final ReviewStorage reviewStorage;
 
-    @Autowired
-    public ReviewService(ReviewStorage reviewDbStorage) {
-        this.reviewStorage = reviewDbStorage;
-    }
+    private final ReviewStorage reviewStorage;
+    private final EventService eventService;
 
     public Review create(Review review) {
         log.trace("В сервис {} получен запрос на создание отзыва {}", this.getClass(), review.toString());
@@ -33,7 +39,10 @@ public class ReviewService {
         if (reviewStorage.isReviewExists(review)) {
             throw new ReviewAlreadyExistsException(review);
         }
-        return reviewStorage.create(review);
+
+        var createdReview = reviewStorage.create(review);
+        eventService.createAddReviewEvent(createdReview.getUserId(), createdReview.getReviewId());
+        return createdReview;
     }
 
     public Review get(long id) {
@@ -49,7 +58,12 @@ public class ReviewService {
         if (!reviewStorage.isReviewExists(review.getReviewId())) {
             throw new ReviewNotExistsException(review);
         }
-        return reviewStorage.update(review);
+
+        reviewStorage.update(review);
+
+        var updatedReview = reviewStorage.get(review.getReviewId());
+        eventService.createUpdateReviewEvent(updatedReview.getUserId(), updatedReview.getReviewId());
+        return updatedReview;
     }
 
     public boolean delete(long id) {
@@ -57,7 +71,13 @@ public class ReviewService {
         if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        return reviewStorage.delete(id);
+
+        var deletedReview = reviewStorage.get(id);
+        var isDeleted = reviewStorage.delete(id);
+        if (isDeleted) {
+            eventService.createRemoveReviewEvent(deletedReview.getUserId(), deletedReview.getReviewId());
+        }
+        return isDeleted;
     }
 
     public List<Review> getAll() {
