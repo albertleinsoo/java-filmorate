@@ -1,23 +1,29 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.*;
+import ru.yandex.practicum.filmorate.exeptions.DislikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.DislikeNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.LikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.LikeNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.NullUserOrFilmIdException;
+import ru.yandex.practicum.filmorate.exeptions.ReviewAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.ReviewNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewDbStorage;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
-    private final ReviewDbStorage reviewDbStorage;
 
-    @Autowired
-    public ReviewService(ReviewDbStorage reviewDbStorage) {
-        this.reviewDbStorage = reviewDbStorage;
-    }
+    private final ReviewDbStorage reviewDbStorage;
+    private final EventService eventService;
 
     public Review create(Review review) {
         log.trace("В сервис {} получен запрос на создание отзыва {}", this.getClass(), review.toString());
@@ -34,7 +40,10 @@ public class ReviewService {
         if (reviewDbStorage.checkReview(review)) {
             throw new ReviewAlreadyExistsException(review);
         }
-        return reviewDbStorage.create(review);
+
+        var createdReview = reviewDbStorage.create(review);
+        eventService.createAddReviewEvent(createdReview.getUserId(), createdReview.getReviewId());
+        return createdReview;
     }
 
     public Review get(long id) {
@@ -50,7 +59,12 @@ public class ReviewService {
         if (!reviewDbStorage.checkReview(review.getReviewId())) {
             throw new ReviewNotExistsException(review);
         }
-        return reviewDbStorage.update(review);
+
+        reviewDbStorage.update(review);
+
+        var updatedReview = reviewDbStorage.get(review.getReviewId());
+        eventService.createUpdateReviewEvent(updatedReview.getUserId(), updatedReview.getReviewId());
+        return updatedReview;
     }
 
     public boolean delete(long id) {
@@ -58,7 +72,13 @@ public class ReviewService {
         if (!reviewDbStorage.checkReview(id)) {
             throw new ReviewNotExistsException(id);
         }
-        return reviewDbStorage.delete(id);
+
+        var deletedReview = reviewDbStorage.get(id);
+        var isDeleted = reviewDbStorage.delete(id);
+        if (isDeleted) {
+            eventService.createRemoveReviewEvent(deletedReview.getUserId(), deletedReview.getReviewId());
+        }
+        return isDeleted;
     }
 
     public List<Review> getAll() {

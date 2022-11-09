@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS REVIEWS_LIKES, REVIEWS, USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS;
+DROP TABLE IF EXISTS REVIEWS_LIKES, REVIEWS, USERS, FILMS, USER_FRIENDS, FILM_LIKES, FILM_GENRE, GENRE, RATINGS, EVENTS;
 
 create table GENRE
 (
@@ -111,4 +111,21 @@ create table if not exists REVIEWS_LIKES
         foreign key (USER_ID) references USERS on delete cascade,
     constraint REVIEWS_LIKES_REVIEW_ID_REVIEWS_REVIEW_ID_FK
         foreign key (REVIEW_ID) references REVIEWS on delete cascade
+);
+
+CREATE TABLE events (
+	event_id BIGINT NOT NULL AUTO_INCREMENT,
+	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	user_id BIGINT NOT NULL,
+	operation ENUM('ADD', 'REMOVE', 'UPDATE') NOT NULL,
+	event_type ENUM('FRIEND', 'LIKE', 'REVIEW') NOT NULL,
+	entity_id BIGINT NOT NULL,
+
+	CONSTRAINT pk_events
+		PRIMARY KEY (event_id),
+
+	CONSTRAINT fk_events_user_id
+    	FOREIGN KEY (user_id)
+    	REFERENCES users (user_id)
+    	ON DELETE CASCADE
 );
