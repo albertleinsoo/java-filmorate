@@ -21,13 +21,19 @@ public interface ReviewStorage {
 
     void addLike(long id, long userId);
 
+    void addDislike(long id, long userId);
+
     void deleteLike(long id, long userId);
 
     void deleteDislike(long id, long userId);
 
-    boolean checkReview(Review review);
+    boolean isReviewExists(Review review);
 
-    boolean checkReview(long id);
+    boolean isReviewExists(long id);
 
-    boolean checkLike(long reviewId, long userId, boolean liked);
+    boolean isLikeExists(long reviewId, long userId, boolean liked);
+
+    boolean isUserExists(long userId);
+
+    boolean isFilmExists(long filmId);
 }
