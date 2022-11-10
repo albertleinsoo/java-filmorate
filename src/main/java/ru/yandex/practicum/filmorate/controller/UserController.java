@@ -1,24 +1,35 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.EventService;
+
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.RecommendationService;
+
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
 
-@Slf4j
 @RestController
+@RequiredArgsConstructor
+@Slf4j
 public class UserController {
 
     private final UserService userService;
-
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
+    private final EventService eventService;
+    private final RecommendationService recommendationService;
 
     @GetMapping("/users")
     public List<User> findAll() {
@@ -58,5 +69,20 @@ public class UserController {
     @DeleteMapping("/users/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
         userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/users/{userId}/feed")
+    public List<Event> getFeed(@PathVariable long userId) {
+        return eventService.getFeed(userId);
+    }
+
+    @DeleteMapping("/users/{userId}")
+    public void deleteUser(@PathVariable long userId) {
+        userService.deleteUser(userId);
+    }
+
+    @GetMapping("/users/{id}/recommendations")
+    public List<Film> getRecommendedFilms(@PathVariable long id) {
+        return recommendationService.getRecommendedFilms(id);
     }
 }

@@ -34,3 +34,4 @@ build/
 
 ### Database ###
 db/
+.DS_Store

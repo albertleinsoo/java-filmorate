@@ -15,7 +15,7 @@ public interface UserStorage {
 
     User update(User film);
 
-    boolean delete(User user);
+    void deleteUser(long userId);
 
     User getUser(long id);
 

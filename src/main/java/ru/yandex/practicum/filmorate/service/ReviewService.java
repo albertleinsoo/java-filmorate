@@ -1,69 +1,88 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.*;
+import ru.yandex.practicum.filmorate.exeptions.DislikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.DislikeNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.LikeAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.LikeNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.NullUserOrFilmIdException;
+import ru.yandex.practicum.filmorate.exeptions.ReviewAlreadyExistsException;
+import ru.yandex.practicum.filmorate.exeptions.ReviewNotExistsException;
+import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.storage.ReviewDbStorage;
+import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class ReviewService {
-    private final ReviewDbStorage reviewDbStorage;
 
-    @Autowired
-    public ReviewService(ReviewDbStorage reviewDbStorage) {
-        this.reviewDbStorage = reviewDbStorage;
-    }
+    private final ReviewStorage reviewStorage;
+    private final EventService eventService;
 
     public Review create(Review review) {
         log.trace("В сервис {} получен запрос на создание отзыва {}", this.getClass(), review.toString());
         if (review.getUserId() == 0 || review.getFilmId() == 0) {
             throw new NullUserOrFilmIdException();
         }
-        if (!reviewDbStorage.checkUser(review.getUserId())) {
+        if (!reviewStorage.isUserExists(review.getUserId())) {
             throw new UserIdUnknownException(review.getUserId());
         }
-        if (!reviewDbStorage.checkFilm(review.getFilmId())) {
-            //TODO Find out, why "String message" expected?
+        if (!reviewStorage.isFilmExists(review.getFilmId())) {
             throw new FilmIdUnknownException(String.valueOf(review.getFilmId()));
         }
-        if (reviewDbStorage.checkReview(review)) {
+        if (reviewStorage.isReviewExists(review)) {
             throw new ReviewAlreadyExistsException(review);
         }
-        return reviewDbStorage.create(review);
+
+        var createdReview = reviewStorage.create(review);
+        eventService.createAddReviewEvent(createdReview.getUserId(), createdReview.getReviewId());
+        return createdReview;
     }
 
     public Review get(long id) {
         log.trace("В сервис {} получен запрос на получение отзыва с id {}", this.getClass(), id);
-        if (!reviewDbStorage.checkReview(id)) {
+        if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        return reviewDbStorage.get(id);
+        return reviewStorage.get(id);
     }
 
     public Review update(Review review) {
         log.trace("В сервис {} получен запрос на обновление отзыва {}", this.getClass(), review.toString());
-        if (!reviewDbStorage.checkReview(review.getReviewId())) {
+        if (!reviewStorage.isReviewExists(review.getReviewId())) {
             throw new ReviewNotExistsException(review);
         }
-        return reviewDbStorage.update(review);
+
+        reviewStorage.update(review);
+
+        var updatedReview = reviewStorage.get(review.getReviewId());
+        eventService.createUpdateReviewEvent(updatedReview.getUserId(), updatedReview.getReviewId());
+        return updatedReview;
     }
 
     public boolean delete(long id) {
         log.trace("В сервис {} получен запрос на удаление отзыва с id {}", this.getClass(), id);
-        if (!reviewDbStorage.checkReview(id)) {
+        if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        return reviewDbStorage.delete(id);
+
+        var deletedReview = reviewStorage.get(id);
+        var isDeleted = reviewStorage.delete(id);
+        if (isDeleted) {
+            eventService.createRemoveReviewEvent(deletedReview.getUserId(), deletedReview.getReviewId());
+        }
+        return isDeleted;
     }
 
     public List<Review> getAll() {
         log.trace("В сервис {} получен запрос на получение всех отзывов", this.getClass());
-        return reviewDbStorage.getAll();
+        return reviewStorage.getAll();
     }
 
     public List<Review> getReviewsByFilm(long filmId, int count) {
@@ -71,11 +90,10 @@ public class ReviewService {
                 this.getClass(),
                 filmId,
                 count);
-        if (!reviewDbStorage.checkFilm(filmId)) {
-            //TODO Find out, why "String message" expected?
+        if (!reviewStorage.isFilmExists(filmId)) {
             throw new FilmIdUnknownException(String.valueOf(filmId));
         }
-        return reviewDbStorage.getReviewByFilm(filmId, count);
+        return reviewStorage.getReviewByFilm(filmId, count);
     }
 
     public void addLike(long id, long userId) {
@@ -83,17 +101,17 @@ public class ReviewService {
                 this.getClass(),
                 id,
                 userId);
-        if (!reviewDbStorage.checkReview(id)) {
+        if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewDbStorage.checkUser(userId)) {
+        if (!reviewStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
-        if (!reviewDbStorage.checkLike(id, userId, true)) {
-            reviewDbStorage.addLike(id, userId);
-            Review review = reviewDbStorage.get(id);
+        if (!reviewStorage.isLikeExists(id, userId, true)) {
+            reviewStorage.addLike(id, userId);
+            Review review = reviewStorage.get(id);
             review.setUseful(review.getUseful() + 1);
-            reviewDbStorage.updateUseful(review);
+            reviewStorage.updateUseful(review);
         } else {
             throw new LikeAlreadyExistsException(id, userId);
         }
@@ -104,17 +122,17 @@ public class ReviewService {
                 this.getClass(),
                 id,
                 userId);
-        if (!reviewDbStorage.checkReview(id)) {
+        if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewDbStorage.checkUser(userId)) {
+        if (!reviewStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
-        if (!reviewDbStorage.checkLike(id, userId, false)) {
-            reviewDbStorage.addDislike(id, userId);
-            Review review = reviewDbStorage.get(id);
+        if (!reviewStorage.isLikeExists(id, userId, false)) {
+            reviewStorage.addDislike(id, userId);
+            Review review = reviewStorage.get(id);
             review.setUseful(review.getUseful() - 1);
-            reviewDbStorage.updateUseful(review);
+            reviewStorage.updateUseful(review);
         } else {
             throw new DislikeAlreadyExistsException(id, userId);
         }
@@ -125,17 +143,17 @@ public class ReviewService {
                 this.getClass(),
                 id,
                 userId);
-        if (!reviewDbStorage.checkReview(id)) {
+        if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewDbStorage.checkUser(userId)) {
+        if (!reviewStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
-        if (reviewDbStorage.checkLike(id, userId, true)) {
-            reviewDbStorage.deleteLike(id, userId);
-            Review review = reviewDbStorage.get(id);
+        if (reviewStorage.isLikeExists(id, userId, true)) {
+            reviewStorage.deleteLike(id, userId);
+            Review review = reviewStorage.get(id);
             review.setUseful(review.getUseful() - 1);
-            reviewDbStorage.updateUseful(review);
+            reviewStorage.updateUseful(review);
         } else {
             throw new LikeNotExistsException(id, userId);
         }
@@ -146,17 +164,17 @@ public class ReviewService {
                 this.getClass(),
                 id,
                 userId);
-        if (!reviewDbStorage.checkReview(id)) {
+        if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewDbStorage.checkUser(userId)) {
+        if (!reviewStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
-        if (reviewDbStorage.checkLike(id, userId, false)) {
-            reviewDbStorage.deleteDislike(id, userId);
-            Review review = reviewDbStorage.get(id);
+        if (reviewStorage.isLikeExists(id, userId, false)) {
+            reviewStorage.deleteDislike(id, userId);
+            Review review = reviewStorage.get(id);
             review.setUseful(review.getUseful() + 1);
-            reviewDbStorage.updateUseful(review);
+            reviewStorage.updateUseful(review);
         } else {
             throw new DislikeNotExistsException(id, userId);
         }
