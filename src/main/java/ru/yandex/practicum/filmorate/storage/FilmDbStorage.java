@@ -287,7 +287,6 @@ public class FilmDbStorage implements FilmStorage {
             allLikes.add(like);
             while (rs.next()) {
                 like = new Long[]{rs.getLong("film_id"), rs.getLong("user_id")};
-                //System.out.println("Like created: "+ Arrays.toString(like));
                 allLikes.add(like);
             }
         });

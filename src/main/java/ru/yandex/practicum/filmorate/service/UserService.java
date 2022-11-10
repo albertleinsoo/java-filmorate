@@ -49,11 +49,7 @@ public class UserService {
     /**
      * Добавление пользователя в список друзей
      *
-<<<<<<< HEAD
      * @param userId   Id пользователя, который добавляет в друзья
-=======
-     * @param id       Id пользователя, который добавляет в друзья
->>>>>>> add-recommendations
      * @param friendId Id пользователя, которого добавляют в друзья
      */
     public void addFriend(final long userId, final long friendId) {
@@ -73,11 +69,7 @@ public class UserService {
     /**
      * Удаление пользователя из списка друзей
      *
-<<<<<<< HEAD
      * @param userId   Id пользователя, который удаляет в друга
-=======
-     * @param id       Id пользователя, который удаляет в друга
->>>>>>> add-recommendations
      * @param friendId Id пользователя, которого удаляют из друзей
      */
     public void deleteFriend(final long userId, final long friendId) {

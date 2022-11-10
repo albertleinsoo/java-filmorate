@@ -23,7 +23,6 @@ public class RecommendationService {
     private final UserStorage userStorage;
 
     public List<Film> getRecommendedFilms(Long userId) {
-        //film_id, user_id
         if (userStorage.isUserExists(userId)){
             throw new UserIdUnknownException(userId);
         }
@@ -35,10 +34,10 @@ public class RecommendationService {
             return new ArrayList<>();
         }
 
-        return cookRecommendationList(allLikes, userId);
+        return makeRecommendationList(allLikes, userId);
     }
 
-    private List<Film> cookRecommendationList(List<Long[]> allLikes, Long userId) {
+    private List<Film> makeRecommendationList(List<Long[]> allLikes, Long userId) {
         List<Long> userLikes = getUserFavourites(allLikes, userId);
         if (userLikes.isEmpty()) {
             log.info("User hasn`t liked anything yet");
@@ -52,7 +51,7 @@ public class RecommendationService {
             return new ArrayList<>();
         }
 
-        return cookRelevantFilmsList(likesCrossingsUsers, userLikes, allLikes);
+        return makeRelevantFilmsList(likesCrossingsUsers, userLikes, allLikes);
     }
 
     private List<Long> getUserFavourites(List<Long[]> allLikes, Long userId) {
@@ -99,7 +98,7 @@ public class RecommendationService {
         return sortedByCommonLikes;
     }
 
-    private List<Film> cookRelevantFilmsList (List<Long> commonLikesUsers, List<Long> userLikes, List<Long[]> allLikes) {
+    private List<Film> makeRelevantFilmsList (List<Long> commonLikesUsers, List<Long> userLikes, List<Long[]> allLikes) {
         List<Long> recommendedFilmsId = new ArrayList<>();
         for (Long id : commonLikesUsers) {
             List<Long> userFavourites = getUserFavourites(allLikes, id);
