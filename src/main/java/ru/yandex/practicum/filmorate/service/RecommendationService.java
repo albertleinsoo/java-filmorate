@@ -55,7 +55,6 @@ public class RecommendationService {
     }
 
     private List<Long> getUserFavourites(List<Long[]> allLikes, Long userId) {
-        //film_id, user_id
         List<Long> userLikes = new ArrayList<>();
         for (Long[] like : allLikes) {
             if (like[1] == userId) {
