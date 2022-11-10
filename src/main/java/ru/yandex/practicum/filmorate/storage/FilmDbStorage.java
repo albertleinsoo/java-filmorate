@@ -13,7 +13,8 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -270,10 +271,41 @@ public class FilmDbStorage implements FilmStorage {
         return (jdbcTemplate.update(deleteFilmLike, filmId, userId)) > 0;
     }
 
+
     @Override
     public boolean isFilmExists(long filmId) {
         String sql = "SELECT 1 FROM films WHERE film_id = ? LIMIT 1";
         return Boolean.TRUE.equals(jdbcTemplate.query(sql, ResultSet::next, filmId));
+    }
+
+    @Override
+    public List<Long[]> getAllLikes() {
+        List<Long[]> allLikes = new ArrayList<>();
+
+        jdbcTemplate.query("select * from film_likes", (ResultSet rs) -> {
+            Long[] like = {rs.getLong("film_id"), rs.getLong("user_id")};
+            allLikes.add(like);
+            while (rs.next()) {
+                like = new Long[]{rs.getLong("film_id"), rs.getLong("user_id")};
+                allLikes.add(like);
+            }
+        });
+        return allLikes;
+    }
+
+    @Override
+    public List<Film> getFilmsByIdList(List<Long> filmIds) {
+        final String inSql = filmIds.stream().map(Object::toString)
+                .collect(Collectors.joining(","));
+        final String sqlQuery = "select films.*, ratings.rating_name" +
+                " from films, ratings " +
+                "where films.rating_id = ratings.rating_id and film_id in (" + inSql + ")";
+
+        List<Film> recommendedFilms = jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
+
+        log.info("Recommendations list returned");
+        return recommendedFilms;
+
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

@@ -105,6 +105,15 @@ public class InMemoryFilmStorage implements FilmStorage {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getDirectorFilmsSortedBy\" не реализован");
     }
 
+    public List<Long[]> getAllLikes() {
+        return null;
+    }
+
+    @Override
+    public List<Film> getFilmsByIdList(List<Long> recommendedFilmsId) {
+        return null;
+    }
+
     private int generateFilmId() {
         return filmId++;
     }
