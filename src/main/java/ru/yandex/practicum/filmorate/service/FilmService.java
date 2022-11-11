@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -21,7 +22,8 @@ public class FilmService {
 
     @Qualifier("filmDbStorage")
     private final FilmStorage filmStorage;
-
+    @Qualifier("userDbStorage")
+    private final UserStorage userStorage;
     private final DirectorStorage directorStorage;
     private final EventService eventService;
 
@@ -41,6 +43,16 @@ public class FilmService {
 
     public Film getFilm(final long id) {
         return filmStorage.getFilm(id);
+    }
+
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        if (!userStorage.isUserExists(userId)) {
+            throw new UserIdUnknownException(userId);
+        }
+        if (!userStorage.isUserExists(friendId)) {
+            throw new UserIdUnknownException(friendId);
+        }
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 
     public void deleteFilm(long filmId) {

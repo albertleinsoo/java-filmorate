@@ -106,7 +106,7 @@ public class UserService {
      */
     public List<User> userFriends(final long id) {
         //Формируется список друзей пользователя
-        if (userStorage.isUserExists(id)) {
+        if (!userStorage.isUserExists(id)) {
             throw new UserIdUnknownException(id);
         }
         return userStorage.getFriendList(id);

@@ -171,7 +171,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public boolean isUserExists(long userId) {
         String sql = "SELECT 1 FROM users WHERE user_id = ? LIMIT 1";
-        return !Boolean.TRUE.equals(jdbcTemplate.query(sql, ResultSet::next, userId));
+        return Boolean.TRUE.equals(jdbcTemplate.query(sql, ResultSet::next, userId));
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
