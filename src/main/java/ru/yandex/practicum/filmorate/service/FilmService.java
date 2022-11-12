@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.FilmSearchByTitleDirectorException;
 import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
@@ -113,6 +114,15 @@ public class FilmService {
     public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
         directorStorage.checkDirector(directorId);
         return filmStorage.getDirectorFilmsSortedBy(directorId, sortBy);
+    }
+
+    public List<Film> searchFilmsByTitleDirector(String query, String by) {
+        if (by.equals("title") || by.equals("director") || by.equals("title,director") || by.equals("director,title")) {
+            return filmStorage.searchFilmsByTitleDirector(query, by);
+        } else {
+            throw new FilmSearchByTitleDirectorException("Неверные параметры поиска фильма: " + by + " . " +
+                    "Ожидалось: title ; director ; title,director");
+        }
     }
 
     private void validateFilmDate(Film film) {

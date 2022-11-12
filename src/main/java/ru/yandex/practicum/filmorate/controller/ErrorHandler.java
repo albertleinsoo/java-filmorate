@@ -79,6 +79,12 @@ public class ErrorHandler {
         return e.getMessage();
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String handleFilmSearchByTitleDirectorException(final FilmSearchByTitleDirectorException e) {
+        return e.getMessage();
+    }
+
     @ExceptionHandler({DislikeNotExistsException.class,
             ReviewNotExistsException.class,
             LikeNotExistsException.class})
@@ -102,7 +108,6 @@ public class ErrorHandler {
         log.error("{}: {}", message, e.getEvent());
         return getExceptionResponse(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
 
     private ResponseEntity<String> getExceptionResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(message, status);
