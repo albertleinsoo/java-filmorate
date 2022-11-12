@@ -13,7 +13,9 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,6 +25,8 @@ import java.util.stream.Collectors;
 public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
+
+    //private final NamedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
 
     /**
      * @return Список всех фильмов
@@ -423,7 +427,8 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> searchFilmsByTitleDirector(String query, String by) {
+    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
+        String sqlParam = "%" + query + "%";
         String sql =
                 "SELECT F.*, R.RATING_NAME FROM FILMS F " +
                         "LEFT JOIN FILM_DIRECTOR FD ON FD.FILM_ID = F.FILM_ID " +
@@ -433,11 +438,11 @@ public class FilmDbStorage implements FilmStorage {
                         "WHERE UPPER(CONCAT(" +
                                                 (by.contains("title") ? "F.NAME" : "NULL") + ", " +
                                                 (by.contains("director") ? "D.NAME" : "NULL") +
-                                            ")) LIKE UPPER('%" + query + "%')" +
+                                            ")) LIKE UPPER(?)" +
                         "GROUP BY F.film_id " +
                         "ORDER BY COUNT(FL.user_id) DESC;";
 
-        return jdbcTemplate.query(sql, this::mapRowToFilm);
+        return jdbcTemplate.query(sql, this::mapRowToFilm, sqlParam);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {

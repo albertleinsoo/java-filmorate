@@ -60,7 +60,6 @@ public class DirectorDbStorage implements DirectorStorage {
 
     }
 
-
     public void checkDirector(long directorId) {
         String sql = "SELECT COUNT(*) FROM DIRECTOR WHERE director_id = ?;";
         if (jdbcTemplate.queryForObject(sql, Integer.class, directorId) != 1) {
@@ -75,6 +74,4 @@ public class DirectorDbStorage implements DirectorStorage {
                 .name(resultSet.getString("name"))
                 .build();
     }
-
-
 }

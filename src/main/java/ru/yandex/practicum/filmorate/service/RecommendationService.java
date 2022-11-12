@@ -9,7 +9,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static java.util.stream.Collectors.toList;
 
@@ -90,7 +93,7 @@ public class RecommendationService {
         }
         List<Long> sortedByCommonLikes = crossingCounts.entrySet().stream()
                 .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
-                .map(entry -> entry.getKey())
+                .map(Map.Entry::getKey)
                 .collect(toList());
 
         log.info("List of likes crossings prepared for the user");

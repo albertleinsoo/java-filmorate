@@ -81,7 +81,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleFilmSearchByTitleDirectorException(final FilmSearchByTitleDirectorException e) {
+    public String handleFilmSearchByTitleDirectorException(final FilmSearchInvalidParamsException e) {
         return e.getMessage();
     }
 
@@ -112,5 +112,4 @@ public class ErrorHandler {
     private ResponseEntity<String> getExceptionResponse(String message, HttpStatus status) {
         return new ResponseEntity<>(message, status);
     }
-
 }

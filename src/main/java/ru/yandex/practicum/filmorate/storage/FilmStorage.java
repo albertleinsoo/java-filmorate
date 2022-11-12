@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Интерфейс хранения фильмов
@@ -36,7 +37,7 @@ public interface FilmStorage {
 
     List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy);
 
-    List<Film> searchFilmsByTitleDirector(String query, String by);
+    List<Film> searchFilmsByTitleDirector(String query, Set<String> by);
 
     List<Long[]> getAllLikes();
 

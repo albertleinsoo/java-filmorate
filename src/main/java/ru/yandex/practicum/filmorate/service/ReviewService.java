@@ -3,15 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exeptions.DislikeAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exeptions.DislikeNotExistsException;
-import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
-import ru.yandex.practicum.filmorate.exeptions.LikeAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exeptions.LikeNotExistsException;
-import ru.yandex.practicum.filmorate.exeptions.NullUserOrFilmIdException;
-import ru.yandex.practicum.filmorate.exeptions.ReviewAlreadyExistsException;
-import ru.yandex.practicum.filmorate.exeptions.ReviewNotExistsException;
-import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.*;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
 

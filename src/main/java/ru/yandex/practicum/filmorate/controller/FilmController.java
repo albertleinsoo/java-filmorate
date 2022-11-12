@@ -2,19 +2,15 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -83,7 +79,8 @@ public class FilmController {
 
     @GetMapping("/films/search")
     public List<Film> searchFilmsByTitleDirector(@RequestParam String query, @RequestParam String by) {
-        return filmService.searchFilmsByTitleDirector(query, by);
+        String[] byParams = by.split(",");
+        Set<String> searchParams = new HashSet<>(Arrays.asList(byParams));
+        return filmService.searchFilmsByTitleDirector(query, searchParams);
     }
-
 }

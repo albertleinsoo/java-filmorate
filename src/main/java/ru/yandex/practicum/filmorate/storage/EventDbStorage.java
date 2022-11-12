@@ -65,5 +65,4 @@ public class EventDbStorage implements EventStorage {
                 .entityId(rs.getLong("entity_id"))
                 .build();
     }
-
 }
