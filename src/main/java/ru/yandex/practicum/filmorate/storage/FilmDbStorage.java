@@ -26,8 +26,6 @@ public class FilmDbStorage implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
 
-    //private final NamedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-
     /**
      * @return Список всех фильмов
      */
