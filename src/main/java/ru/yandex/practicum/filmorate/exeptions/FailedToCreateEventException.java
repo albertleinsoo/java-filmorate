@@ -14,5 +14,4 @@ public class FailedToCreateEventException extends RuntimeException {
     public Event getEvent() {
         return event;
     }
-
 }

@@ -13,7 +13,9 @@ import ru.yandex.practicum.filmorate.model.Rating;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -329,20 +331,6 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
-        return Film.builder()
-                .id(resultSet.getLong("film_id"))
-                .name(resultSet.getString("name"))
-                .mpa(new Rating(resultSet.getLong("rating_id"), resultSet.getString("rating_name")))
-                .description(resultSet.getString("description"))
-                .releaseDate(resultSet.getDate("release_date").toLocalDate())
-                .duration(resultSet.getInt("duration"))
-                .genres(getSetGenres(resultSet))
-                .rate(resultSet.getInt("rate"))
-                .directors(getSetDirectors(resultSet))
-                .build();
-    }
-
     private Rating getSetRating(ResultSet rs) throws SQLException {
         final String findMpaById = "SELECT * " +
                 "FROM RATINGS " +
@@ -413,7 +401,6 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(findDirectorByFilmId, this::mapRowToDirector, filmId);
     }
 
-
     public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
 
         final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
@@ -437,6 +424,38 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sortBy.equals("year") ? findPopularFilmsWithYear : findPopularFilmsWithLikes, this::mapRowToFilm, directorId);
     }
 
+    @Override
+    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
+        String sqlParam = "%" + query + "%";
+        String sql =
+                "SELECT F.*, R.RATING_NAME FROM FILMS F " +
+                        "LEFT JOIN FILM_DIRECTOR FD ON FD.FILM_ID = F.FILM_ID " +
+                        "LEFT JOIN DIRECTOR D ON D.DIRECTOR_ID = FD.DIRECTOR_ID " +
+                        "LEFT JOIN RATINGS R ON F.RATING_ID = R.RATING_ID " +
+                        "LEFT JOIN FILM_LIKES FL ON FL.film_id = F.film_id " +
+                        "WHERE UPPER(CONCAT(" +
+                                                (by.contains("title") ? "F.NAME" : "NULL") + ", " +
+                                                (by.contains("director") ? "D.NAME" : "NULL") +
+                                            ")) LIKE UPPER(?)" +
+                        "GROUP BY F.film_id " +
+                        "ORDER BY COUNT(FL.user_id) DESC;";
+
+        return jdbcTemplate.query(sql, this::mapRowToFilm, sqlParam);
+    }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getLong("film_id"))
+                .name(resultSet.getString("name"))
+                .mpa(new Rating(resultSet.getLong("rating_id"), resultSet.getString("rating_name")))
+                .description(resultSet.getString("description"))
+                .releaseDate(resultSet.getDate("release_date").toLocalDate())
+                .duration(resultSet.getInt("duration"))
+                .genres(getSetGenres(resultSet))
+                .rate(resultSet.getInt("rate"))
+                .directors(getSetDirectors(resultSet))
+                .build();
+    }
 
     private Rating mapRowToRating(ResultSet resultSet, int rowNum) throws SQLException {
         return Rating.builder()
@@ -451,7 +470,6 @@ public class FilmDbStorage implements FilmStorage {
                 .name(resultSet.getString("name"))
                 .build();
     }
-
 
     private Director mapRowToDirector(ResultSet resultSet, int rowNum) throws SQLException {
         return Director.builder()

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.FilmSearchInvalidParamsException;
 import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.DirectorStorage;
@@ -14,6 +15,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -115,6 +117,14 @@ public class FilmService {
         return filmStorage.getDirectorFilmsSortedBy(directorId, sortBy);
     }
 
+    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
+        if (by.contains("title") || by.contains("director")) {
+            return filmStorage.searchFilmsByTitleDirector(query, by);
+        } else {
+            throw new FilmSearchInvalidParamsException(by.toString());
+        }
+    }
+
     private void validateFilmDate(Film film) {
         try {
             if (film.getName().isEmpty()) {
@@ -131,5 +141,4 @@ public class FilmService {
             throw e;
         }
     }
-
 }

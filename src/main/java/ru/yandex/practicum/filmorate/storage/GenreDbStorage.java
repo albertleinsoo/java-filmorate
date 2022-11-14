@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 @Qualifier("genreDbStorage")
 @RequiredArgsConstructor
-public class GenreDbStorage implements GenreStorage{
+public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override

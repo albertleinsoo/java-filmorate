@@ -27,7 +27,6 @@ public class ReviewController {
         return reviewService.get(id);
     }
 
-
     @PostMapping("/reviews")
     public Review create(@RequestBody @Valid Review review) {
         log.trace("В контроллер {} получен запрос на создание отзыва {}", this.getClass(), review.toString());

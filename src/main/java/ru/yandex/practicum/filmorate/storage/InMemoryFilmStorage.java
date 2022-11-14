@@ -8,10 +8,7 @@ import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
 import ru.yandex.practicum.filmorate.exeptions.MethodNotImplementedException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Qualifier("inMemoryFilmStorage")
@@ -108,6 +105,11 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
         throw new MethodNotImplementedException("Метод \"InMemoryFilmStorage.getDirectorFilmsSortedBy\" не реализован");
+    }
+
+    @Override
+    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
+        throw new MethodNotImplementedException("Метод \"searchFilmsByTitleDirector.getDirectorFilmsSortedBy\" не реализован");
     }
 
     public List<Long[]> getAllLikes() {

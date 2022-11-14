@@ -4,6 +4,9 @@ import ru.yandex.practicum.filmorate.model.Review;
 
 import java.util.List;
 
+/**
+ * Интерфейс хранения отзывов
+ */
 public interface ReviewStorage {
     Review create(Review review);
 
