@@ -113,7 +113,7 @@ create table if not exists REVIEWS_LIKES
         foreign key (REVIEW_ID) references REVIEWS on delete cascade
 );
 
-CREATE TABLE events (
+CREATE TABLE if not exists events (
 	event_id BIGINT NOT NULL AUTO_INCREMENT,
 	time_stamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	user_id BIGINT NOT NULL,
@@ -131,7 +131,7 @@ CREATE TABLE events (
 );
 
 
-create table DIRECTOR
+create table if not exists DIRECTOR
 (
     DIRECTOR_ID BIGINT auto_increment
         primary key,
@@ -139,7 +139,7 @@ create table DIRECTOR
         unique
 );
 
-create table FILM_DIRECTOR
+create table if not exists FILM_DIRECTOR
 (
     FILM_DIRECTOR_ID BIGINT auto_increment
         primary key,

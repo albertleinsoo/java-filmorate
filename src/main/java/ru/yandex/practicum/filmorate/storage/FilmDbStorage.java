@@ -331,6 +331,48 @@ public class FilmDbStorage implements FilmStorage {
 
     }
 
+    @Override
+    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
+        String sqlParam = "%" + query + "%";
+        String sql =
+                "SELECT F.*, R.RATING_NAME FROM FILMS F " +
+                        "LEFT JOIN FILM_DIRECTOR FD ON FD.FILM_ID = F.FILM_ID " +
+                        "LEFT JOIN DIRECTOR D ON D.DIRECTOR_ID = FD.DIRECTOR_ID " +
+                        "LEFT JOIN RATINGS R ON F.RATING_ID = R.RATING_ID " +
+                        "LEFT JOIN FILM_LIKES FL ON FL.film_id = F.film_id " +
+                        "WHERE UPPER(CONCAT(" +
+                                                (by.contains("title") ? "F.NAME" : "NULL") + ", " +
+                                                (by.contains("director") ? "D.NAME" : "NULL") +
+                                            ")) LIKE UPPER(?)" +
+                        "GROUP BY F.film_id " +
+                        "ORDER BY COUNT(FL.user_id) DESC;";
+
+        return jdbcTemplate.query(sql, this::mapRowToFilm, sqlParam);
+    }
+
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+
+        final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
+                "FROM films f " +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
+                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
+                "LEFT JOIN FILM_DIRECTOR fd on fd.film_id = f.film_id " +
+                "WHERE fd.DIRECTOR_ID = ? " +
+                "GROUP BY f.film_id " +
+                "ORDER BY COUNT(fl.user_id) DESC;";
+
+        final String findPopularFilmsWithYear = "SELECT f.*, R.RATING_NAME " +
+                "FROM films f " +
+                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
+                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
+                "LEFT JOIN FILM_DIRECTOR fd on fd.film_id = f.film_id " +
+                "WHERE fd.DIRECTOR_ID = ? " +
+                "GROUP BY f.film_id " +
+                "ORDER BY f.RELEASE_DATE;";
+
+        return jdbcTemplate.query(sortBy.equals("year") ? findPopularFilmsWithYear : findPopularFilmsWithLikes, this::mapRowToFilm, directorId);
+    }
+
     private Rating getSetRating(ResultSet rs) throws SQLException {
         final String findMpaById = "SELECT * " +
                 "FROM RATINGS " +
@@ -359,10 +401,10 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     /**
-     * Добавление режжисеров в фильм
+     * Добавление режиссёров в фильм
      *
      * @param film фильм
-     * @return объект film с добавленными режжисерами
+     * @return объект film с добавленными режиссёрами
      */
     private Film updateFilmDirectors(Film film) {
         if (film.getDirectors() != null) {
@@ -399,48 +441,6 @@ public class FilmDbStorage implements FilmStorage {
 
         long filmId = rs.getLong("film_id");
         return jdbcTemplate.query(findDirectorByFilmId, this::mapRowToDirector, filmId);
-    }
-
-    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
-
-        final String findPopularFilmsWithLikes = "SELECT f.*, R.RATING_NAME " +
-                "FROM films f " +
-                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
-                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
-                "LEFT JOIN FILM_DIRECTOR fd on fd.film_id = f.film_id " +
-                "WHERE fd.DIRECTOR_ID = ? " +
-                "GROUP BY f.film_id " +
-                "ORDER BY COUNT(fl.user_id) DESC;";
-
-        final String findPopularFilmsWithYear = "SELECT f.*, R.RATING_NAME " +
-                "FROM films f " +
-                "LEFT JOIN film_likes fl ON fl.film_id = f.film_id " +
-                "LEFT JOIN RATINGS R on f.RATING_ID = R.RATING_ID " +
-                "LEFT JOIN FILM_DIRECTOR fd on fd.film_id = f.film_id " +
-                "WHERE fd.DIRECTOR_ID = ? " +
-                "GROUP BY f.film_id " +
-                "ORDER BY f.RELEASE_DATE;";
-
-        return jdbcTemplate.query(sortBy.equals("year") ? findPopularFilmsWithYear : findPopularFilmsWithLikes, this::mapRowToFilm, directorId);
-    }
-
-    @Override
-    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
-        String sqlParam = "%" + query + "%";
-        String sql =
-                "SELECT F.*, R.RATING_NAME FROM FILMS F " +
-                        "LEFT JOIN FILM_DIRECTOR FD ON FD.FILM_ID = F.FILM_ID " +
-                        "LEFT JOIN DIRECTOR D ON D.DIRECTOR_ID = FD.DIRECTOR_ID " +
-                        "LEFT JOIN RATINGS R ON F.RATING_ID = R.RATING_ID " +
-                        "LEFT JOIN FILM_LIKES FL ON FL.film_id = F.film_id " +
-                        "WHERE UPPER(CONCAT(" +
-                                                (by.contains("title") ? "F.NAME" : "NULL") + ", " +
-                                                (by.contains("director") ? "D.NAME" : "NULL") +
-                                            ")) LIKE UPPER(?)" +
-                        "GROUP BY F.film_id " +
-                        "ORDER BY COUNT(FL.user_id) DESC;";
-
-        return jdbcTemplate.query(sql, this::mapRowToFilm, sqlParam);
     }
 
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
