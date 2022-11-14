@@ -92,7 +92,7 @@ public class UserService {
      * @param userId Id пользователя
      */
     public void deleteUser(long userId) {
-        if (userStorage.isUserExists(userId)) {
+        if (!userStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
         userStorage.deleteUser(userId);
