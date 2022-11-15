@@ -1,16 +1,12 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 import ru.yandex.practicum.filmorate.enums.EventOperation;
 import ru.yandex.practicum.filmorate.enums.EventType;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Builder
+@Getter
 public class Event {
 
     private long eventId;
