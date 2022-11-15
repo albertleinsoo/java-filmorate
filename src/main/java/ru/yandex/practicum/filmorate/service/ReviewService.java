@@ -2,10 +2,13 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.*;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
@@ -16,16 +19,20 @@ public class ReviewService {
 
     private final ReviewStorage reviewStorage;
     private final EventService eventService;
+    @Qualifier("filmDbStorage")
+    private final FilmStorage filmStorage;
+    @Qualifier("userDbStorage")
+    private final UserStorage userStorage;
 
     public Review create(Review review) {
         log.trace("В сервис {} получен запрос на создание отзыва {}", this.getClass(), review.toString());
         if (review.getUserId() == 0 || review.getFilmId() == 0) {
             throw new NullUserOrFilmIdException();
         }
-        if (!reviewStorage.isUserExists(review.getUserId())) {
+        if (!userStorage.isUserExists(review.getUserId())) {
             throw new UserIdUnknownException(review.getUserId());
         }
-        if (!reviewStorage.isFilmExists(review.getFilmId())) {
+        if (!filmStorage.isFilmExists(review.getFilmId())) {
             throw new FilmIdUnknownException(String.valueOf(review.getFilmId()));
         }
         if (reviewStorage.isReviewExists(review)) {
@@ -82,7 +89,7 @@ public class ReviewService {
                 this.getClass(),
                 filmId,
                 count);
-        if (!reviewStorage.isFilmExists(filmId)) {
+        if (!filmStorage.isFilmExists(filmId)) {
             throw new FilmIdUnknownException(String.valueOf(filmId));
         }
         return reviewStorage.getReviewByFilm(filmId, count);
@@ -96,7 +103,7 @@ public class ReviewService {
         if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewStorage.isUserExists(userId)) {
+        if (!userStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
         if (!reviewStorage.isLikeExists(id, userId, true)) {
@@ -117,7 +124,7 @@ public class ReviewService {
         if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewStorage.isUserExists(userId)) {
+        if (!userStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
         if (!reviewStorage.isLikeExists(id, userId, false)) {
@@ -138,7 +145,7 @@ public class ReviewService {
         if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewStorage.isUserExists(userId)) {
+        if (!userStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
         if (reviewStorage.isLikeExists(id, userId, true)) {
@@ -159,7 +166,7 @@ public class ReviewService {
         if (!reviewStorage.isReviewExists(id)) {
             throw new ReviewNotExistsException(id);
         }
-        if (!reviewStorage.isUserExists(userId)) {
+        if (!userStorage.isUserExists(userId)) {
             throw new UserIdUnknownException(userId);
         }
         if (reviewStorage.isLikeExists(id, userId, false)) {
