@@ -35,8 +35,4 @@ public interface ReviewStorage {
     boolean isReviewExists(long id);
 
     boolean isLikeExists(long reviewId, long userId, boolean liked);
-
-    boolean isUserExists(long userId);
-
-    boolean isFilmExists(long filmId);
 }

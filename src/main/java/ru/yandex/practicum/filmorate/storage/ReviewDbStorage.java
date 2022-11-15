@@ -139,22 +139,6 @@ public class ReviewDbStorage implements ReviewStorage {
     }
 
 
-    @Override
-    public boolean isUserExists(long userId) {
-        final String SQL_CHECK_USER = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
-                "FROM USERS WHERE USER_ID = ?";
-        String result = jdbcTemplate.query(SQL_CHECK_USER, (rs, rn) -> rs.getString("result"), userId).get(0);
-        return Boolean.parseBoolean(result);
-    }
-
-    @Override
-    public boolean isFilmExists(long filmId) {
-        final String SQL_CHECK_FILM = "SELECT CASE WHEN COUNT(1) > 0 THEN TRUE ELSE FALSE END AS result " +
-                "FROM FILMS WHERE FILM_ID = ?";
-        String result = jdbcTemplate.query(SQL_CHECK_FILM, (rs, rn) -> rs.getString("result"), filmId).get(0);
-        return Boolean.parseBoolean(result);
-    }
-
     private Review mapRowToReview(ResultSet resultSet, int i) throws SQLException {
         return Review.builder()
                 .reviewId(resultSet.getLong("REVIEW_ID"))

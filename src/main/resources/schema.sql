@@ -152,3 +152,4 @@ create table if not exists FILM_DIRECTOR
     constraint FILM_DIRECTOR_DIRECTOR_DIRECTOR_ID_FK
         foreign key (DIRECTOR_ID) references DIRECTOR ON DELETE CASCADE
 );
+
