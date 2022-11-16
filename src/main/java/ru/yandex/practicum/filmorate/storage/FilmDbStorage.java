@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -246,7 +248,8 @@ public class FilmDbStorage implements FilmStorage {
 
     /**
      * Получение списка общих с другом фильмов
-     * @param userId идентификатор пользователя, запрашивающего информацию
+     *
+     * @param userId   идентификатор пользователя, запрашивающего информацию
      * @param friendId идентификатор пользователя, с которым необходимо сравнить список фильмов
      * @return Список фильмов
      */
@@ -341,13 +344,14 @@ public class FilmDbStorage implements FilmStorage {
                         "LEFT JOIN RATINGS R ON F.RATING_ID = R.RATING_ID " +
                         "LEFT JOIN FILM_LIKES FL ON FL.film_id = F.film_id " +
                         "WHERE UPPER(CONCAT(" +
-                                                (by.contains("title") ? "F.NAME" : "NULL") + ", " +
-                                                (by.contains("director") ? "D.NAME" : "NULL") +
-                                            ")) LIKE UPPER(?)" +
+                        (by.contains("title") ? "F.NAME" : "NULL") + ", " +
+                        (by.contains("director") ? "D.NAME" : "NULL") +
+                        ")) LIKE UPPER(?)" +
                         "GROUP BY F.film_id " +
                         "ORDER BY COUNT(FL.user_id) DESC;";
 
         return jdbcTemplate.query(sql, this::mapRowToFilm, sqlParam);
+
     }
 
     public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
@@ -392,11 +396,22 @@ public class FilmDbStorage implements FilmStorage {
             }
             String insertFilmGenre = "INSERT INTO film_genre (film_id, genre_id) " +
                     "VALUES(?, ?)";
-            film.getGenres().stream()
-                    .map(Genre::getId)
-                    .distinct()
-                    .forEach(id -> jdbcTemplate.update(insertFilmGenre, film.getId(), id));
+
+            List<Genre> genres = film.getGenres().stream().distinct().collect(Collectors.toList());
+            jdbcTemplate.batchUpdate(insertFilmGenre, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setLong(1, film.getId());
+                    ps.setLong(2, genres.get(i).getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return genres.size();
+                }
+            });
         }
+
         return getFilm(film.getId());
     }
 
@@ -412,10 +427,19 @@ public class FilmDbStorage implements FilmStorage {
                 return film;
             }
             String insertFilmDirector = "INSERT INTO film_director (film_id, director_id) VALUES(?, ?);";
-            film.getDirectors().stream()
-                    .map(Director::getId)
-                    .distinct()
-                    .forEach(id -> jdbcTemplate.update(insertFilmDirector, film.getId(), id));
+            List<Director> directors = film.getDirectors().stream().distinct().collect(Collectors.toList());
+            jdbcTemplate.batchUpdate(insertFilmDirector, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setLong(1, film.getId());
+                    ps.setLong(2, directors.get(i).getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return directors.size();
+                }
+            });
         }
         return getFilm(film.getId());
     }
@@ -476,5 +500,6 @@ public class FilmDbStorage implements FilmStorage {
                 .id(resultSet.getLong("director_id"))
                 .name(resultSet.getString("name"))
                 .build();
+
     }
 }
