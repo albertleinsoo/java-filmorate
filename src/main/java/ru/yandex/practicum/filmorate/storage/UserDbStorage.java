@@ -70,14 +70,13 @@ public class UserDbStorage implements UserStorage {
 
     /**
      * Удаление пользователя
-     * @param user Удаляемый пользователь
-     * @return Статус (true - false)
+     * @param userId Удаляемый пользователь
      */
     @Override
-    public boolean delete(User user) {
+    public void deleteUser(long userId) {
         String deleteUser = "DELETE FROM users " +
                 "WHERE USER_ID = ?";
-        return jdbcTemplate.update(deleteUser, user.getId()) > 0;
+        jdbcTemplate.update(deleteUser, userId);
     }
 
     /**
@@ -167,6 +166,12 @@ public class UserDbStorage implements UserStorage {
                 "FROM USER_FRIENDS " +
                 "WHERE USER_ID = ? ";
         return new HashSet<>(jdbcTemplate.query(findFriendsIdByUserId, (rs, friend_id) -> rs.getLong("friend_id"), id));
+    }
+
+    @Override
+    public boolean isUserExists(long userId) {
+        String sql = "SELECT 1 FROM users WHERE user_id = ? LIMIT 1";
+        return Boolean.TRUE.equals(jdbcTemplate.query(sql, ResultSet::next, userId));
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

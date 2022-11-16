@@ -15,7 +15,7 @@ public interface UserStorage {
 
     User update(User film);
 
-    boolean delete(User user);
+    void deleteUser(long userId);
 
     User getUser(long id);
 
@@ -26,4 +26,6 @@ public interface UserStorage {
     boolean deleteFriend(long id, long friendId);
 
     Set<Long> getFriendsIdListByUserId(long id);
+
+    boolean isUserExists(long userId);
 }

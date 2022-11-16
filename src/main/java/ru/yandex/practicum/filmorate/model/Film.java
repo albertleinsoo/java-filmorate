@@ -23,6 +23,7 @@ public class Film {
     private long id;
     private Set<Long> likes;
     private List<Genre> genres;
+    private List<Director> directors;
     private int rate;
     private Rating mpa;
     @NotNull

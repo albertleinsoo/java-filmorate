@@ -1,28 +1,33 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exeptions.FilmIdUnknownException;
+import ru.yandex.practicum.filmorate.exeptions.FilmSearchInvalidParamsException;
 import ru.yandex.practicum.filmorate.exeptions.UserIdUnknownException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
-@Slf4j
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class FilmService {
 
-    private FilmStorage filmStorage;
-
-    @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
-        this.filmStorage = filmStorage;
-    }
+    @Qualifier("filmDbStorage")
+    private final FilmStorage filmStorage;
+    @Qualifier("userDbStorage")
+    private final UserStorage userStorage;
+    private final DirectorStorage directorStorage;
+    private final EventService eventService;
 
     public List<Film> findAll() {
         return filmStorage.findAll();
@@ -42,34 +47,85 @@ public class FilmService {
         return filmStorage.getFilm(id);
     }
 
-    public boolean addLike(final long id, final long userId) {
-        if (id <= 0) {
-            throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
+    public List<Film> getCommonFilms(long userId, long friendId) {
+        if (!userStorage.isUserExists(userId)) {
+            throw new UserIdUnknownException(userId);
+        }
+        if (!userStorage.isUserExists(friendId)) {
+            throw new UserIdUnknownException(friendId);
+        }
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
+    public void deleteFilm(long filmId) {
+        if (!filmStorage.isFilmExists(filmId)) {
+            throw new FilmIdUnknownException("Фильм с id: " + filmId + " не найден");
+        }
+        filmStorage.deleteFilm(filmId);
+    }
+
+    public boolean addLike(final long filmId, final long userId) {
+        if (filmId <= 0) {
+            throw new FilmIdUnknownException("Фильм с id: " + filmId + " не найден");
         }
 
         if (userId <= 0) {
             throw new UserIdUnknownException(userId);
         }
-        return filmStorage.addLike(id, userId);
+
+        var isLikeAdded = filmStorage.addLike(filmId, userId);
+        if (isLikeAdded) {
+            eventService.createAddLikeEvent(userId, filmId);
+        }
+        return isLikeAdded;
     }
 
-    public boolean deleteLike(final long id, final long userId) {
-        if (id <= 0) {
-            throw new FilmIdUnknownException("Фильм с id: " + id + " не найден");
+    public boolean deleteLike(final long filmId, final long userId) {
+        if (filmId <= 0) {
+            throw new FilmIdUnknownException("Фильм с id: " + filmId + " не найден");
         }
 
         if (userId <= 0) {
             throw new UserIdUnknownException(userId);
         }
 
-        return filmStorage.deleteLike(userId, id);
+        var isLikeDeleted = filmStorage.deleteLike(userId, filmId);
+        if (isLikeDeleted) {
+            eventService.createRemoveLikeEvent(userId, filmId);
+        }
+        return isLikeDeleted;
     }
 
-    public List<Film> getPopular(final int count) {
-        return filmStorage.getPopularFilms(count);
+    public List<Film> getPopular(int count, Long genreId, Integer year) {
+        List<Film> films;
+
+        if (genreId == null && year == null) {
+            films = filmStorage.getPopularFilms(count);
+        } else if (genreId != null && year != null) {
+            films = filmStorage.getPopularFilms(count, genreId, year);
+        } else if (genreId != null) {
+            films = filmStorage.getPopularFilms(count, genreId);
+        } else {
+            films = filmStorage.getPopularFilms(count, year);
+        }
+
+        return films;
     }
 
-    private void validateFilmDate (Film film) {
+    public List<Film> getDirectorFilmsSortedBy(long directorId, String sortBy) {
+        directorStorage.checkDirector(directorId);
+        return filmStorage.getDirectorFilmsSortedBy(directorId, sortBy);
+    }
+
+    public List<Film> searchFilmsByTitleDirector(String query, Set<String> by) {
+        if (by.contains("title") || by.contains("director")) {
+            return filmStorage.searchFilmsByTitleDirector(query, by);
+        } else {
+            throw new FilmSearchInvalidParamsException(by.toString());
+        }
+    }
+
+    private void validateFilmDate(Film film) {
         try {
             if (film.getName().isEmpty()) {
                 throw new ValidationException("Нет названия фильма");

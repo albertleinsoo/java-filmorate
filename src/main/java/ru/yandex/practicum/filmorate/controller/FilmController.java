@@ -7,7 +7,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -26,8 +29,17 @@ public class FilmController {
     }
 
     @GetMapping("/films/popular")
-    public List<Film> popular (@RequestParam(defaultValue = "10") final int count){
-        return filmService.getPopular(count);
+    public List<Film> getPopular(
+            @RequestParam(defaultValue = "10", required = false) int count,
+            @RequestParam(required = false) Long genreId,
+            @RequestParam(required = false) Integer year
+    ) {
+        return filmService.getPopular(count, genreId, year);
+    }
+
+    @GetMapping("/films/common")
+    public List<Film> getCommonFilms(@RequestParam long userId, @RequestParam long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
     }
 
     @GetMapping("/films/{id}")
@@ -46,7 +58,7 @@ public class FilmController {
     }
 
     @PutMapping("/films/{id}/like/{userId}")
-    public boolean addLike (@PathVariable final long id, @PathVariable final long userId) {
+    public boolean addLike(@PathVariable final long id, @PathVariable final long userId) {
         return filmService.addLike(id, userId);
     }
 
@@ -55,4 +67,20 @@ public class FilmController {
         return filmService.deleteLike(id, userId);
     }
 
+    @DeleteMapping("/films/{filmId}")
+    public void deleteFilm(@PathVariable final long filmId) {
+        filmService.deleteFilm(filmId);
+    }
+
+    @GetMapping("/films/director/{directorId}")
+    public List<Film> getDirectorFilmsSortedBy(@PathVariable final long directorId, @RequestParam String sortBy ) {
+        return filmService.getDirectorFilmsSortedBy(directorId,sortBy);
+    }
+
+    @GetMapping("/films/search")
+    public List<Film> searchFilmsByTitleDirector(@RequestParam String query, @RequestParam String by) {
+        String[] byParams = by.split(",");
+        Set<String> searchParams = new HashSet<>(Arrays.asList(byParams));
+        return filmService.searchFilmsByTitleDirector(query, searchParams);
+    }
 }
