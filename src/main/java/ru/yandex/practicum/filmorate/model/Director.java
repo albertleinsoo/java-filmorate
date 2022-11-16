@@ -1,32 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @Builder
+@Getter
+@Setter
 public class Director {
     private long id;
     @NotBlank
     private String name;
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
 
     public Map<String, Object> toMap() {
         Map<String, Object> values = new HashMap<>();
